@@ -246,7 +246,7 @@ pub fn build(b: *std.Build) void {
     const test_step = b.step("test", "Run lexbor tests");
 
     const tests = b.addTest(.{
-        .root_source_file = b.path("test/unit_tests.zig"),
+        .root_source_file = b.path("test/tests.zig"),
         .target = target,
         .optimize = optimize,
     });
