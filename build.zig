@@ -2,6 +2,7 @@ const std = @import("std");
 const Allocator = std.mem.Allocator;
 const Build = std.Build;
 const Compile = Build.Step.Compile;
+const StaticLibraryOptions = Build.StaticLibraryOptions;
 const argsAlloc = std.process.argsAlloc;
 const eql = std.mem.eql;
 const exit = std.process.exit;
@@ -169,14 +170,6 @@ pub fn build(b: *Build) !void {
     });
     tests.root_module.addImport("lexbor", lib_mod);
 
-    // const install_exe_test = b.addInstallArtifact(tests, .{});
-    // install_exe_test.step.dependOn(b.getInstallStep());
-    //
-    // const run_exe_tests = b.addRunArtifact(tests);
-    // run_exe_tests.step.dependOn(&install_exe_test.step);
-    //
-    // b.installArtifact(tests);
-
     const test_step = b.step("test", "Run lexbor tests");
     test_step.dependOn(&b.addRunArtifact(tests).step);
 }
@@ -212,80 +205,9 @@ fn parseOptions(options: *Options) void {
         is_single = true;
         return;
     }
-
-    // if (options.core) {
-    //     options.core = true;
-    //     options.ports = true;
-    // }
-    // if (options.css) {
-    //     options.core = true;
-    //     options.css = true;
-    //     options.ports = true;
-    // }
-    // if (options.dom) {
-    //     options.core = true;
-    //     options.tag = true;
-    //     options.ns = true;
-    //     options.ports = true;
-    // }
-    // if (options.encoding) {
-    //     options.core = true;
-    //     options.ports = true;
-    // }
-    // if (options.html) {
-    //     options.core = true;
-    //     options.dom = true;
-    //     options.ns = true;
-    //     options.tag = true;
-    //     options.css = true;
-    //     options.selectors = true;
-    //     options.ports = true;
-    // }
-    // if (options.ns) {
-    //     options.core = true;
-    //     options.ports = true;
-    // }
-    // if (options.ports) {
-    //     options.core = true;
-    //     options.ports = true;
-    // }
-    // if (options.punycode) {
-    //     options.core = true;
-    //     options.encoding = true;
-    //     options.ports = true;
-    // }
-    // if (options.selectors) {
-    //     options.core = true;
-    //     options.dom = true;
-    //     options.css = true;
-    //     options.tag = true;
-    //     options.ns = true;
-    //     options.ports = true;
-    // }
-    // if (options.tag) {
-    //     options.core = true;
-    //     options.ports = true;
-    // }
-    // if (options.unicode) {
-    //     options.core = true;
-    //     options.encoding = true;
-    //     options.punycode = true;
-    //     options.ports = true;
-    // }
-    // if (options.url) {
-    //     options.core = true;
-    //     options.encoding = true;
-    //     options.unicode = true;
-    //     options.punycode = true;
-    //     options.ports = true;
-    // }
-    // if (options.utils) {
-    //     options.core = true;
-    //     options.ports = true;
-    // }
 }
 
-fn compileCore(b: *Build, static_options: Build.StaticLibraryOptions) void {
+fn compileCore(b: *Build, static_options: StaticLibraryOptions) void {
     const lib = b.addStaticLibrary(static_options);
     lib.addIncludePath(b.path("lib"));
     // DEPENDENCIES ""
@@ -300,7 +222,7 @@ fn compileCore(b: *Build, static_options: Build.StaticLibraryOptions) void {
     b.installArtifact(lib);
 }
 
-fn compileCss(b: *Build, static_options: Build.StaticLibraryOptions) void {
+fn compileCss(b: *Build, static_options: StaticLibraryOptions) void {
     const lib = b.addStaticLibrary(static_options);
     lib.addIncludePath(b.path("lib"));
     // DEPENDENCIES "core"
@@ -319,7 +241,7 @@ fn compileCss(b: *Build, static_options: Build.StaticLibraryOptions) void {
     b.installArtifact(lib);
 }
 
-fn compileDom(b: *Build, static_options: Build.StaticLibraryOptions) void {
+fn compileDom(b: *Build, static_options: StaticLibraryOptions) void {
     const lib = b.addStaticLibrary(static_options);
     lib.addIncludePath(b.path("lib"));
     // DEPENDENCIES "core tag ns"
@@ -346,7 +268,7 @@ fn compileDom(b: *Build, static_options: Build.StaticLibraryOptions) void {
     b.installArtifact(lib);
 }
 
-fn compileEncoding(b: *Build, static_options: Build.StaticLibraryOptions) void {
+fn compileEncoding(b: *Build, static_options: StaticLibraryOptions) void {
     const lib = b.addStaticLibrary(static_options);
     lib.addIncludePath(b.path("lib"));
     // DEPENDENCIES "core"
@@ -365,7 +287,7 @@ fn compileEncoding(b: *Build, static_options: Build.StaticLibraryOptions) void {
     b.installArtifact(lib);
 }
 
-fn compileHtml(b: *Build, static_options: Build.StaticLibraryOptions) void {
+fn compileHtml(b: *Build, static_options: StaticLibraryOptions) void {
     const lib = b.addStaticLibrary(static_options);
     lib.addIncludePath(b.path("lib"));
     // DEPENDENCIES "core dom ns tag css selectors"
@@ -404,7 +326,7 @@ fn compileHtml(b: *Build, static_options: Build.StaticLibraryOptions) void {
     b.installArtifact(lib);
 }
 
-fn compileNs(b: *Build, static_options: Build.StaticLibraryOptions) void {
+fn compileNs(b: *Build, static_options: StaticLibraryOptions) void {
     const lib = b.addStaticLibrary(static_options);
     lib.addIncludePath(b.path("lib"));
     // DEPENDENCIES "core"
@@ -423,7 +345,7 @@ fn compileNs(b: *Build, static_options: Build.StaticLibraryOptions) void {
     b.installArtifact(lib);
 }
 
-fn compilePorts(b: *Build, static_options: Build.StaticLibraryOptions) void {
+fn compilePorts(b: *Build, static_options: StaticLibraryOptions) void {
     const lib = b.addStaticLibrary(static_options);
     lib.addIncludePath(b.path("lib"));
     lib.addCSourceFiles(.{
@@ -433,7 +355,7 @@ fn compilePorts(b: *Build, static_options: Build.StaticLibraryOptions) void {
     b.installArtifact(lib);
 }
 
-fn compilePunycode(b: *Build, static_options: Build.StaticLibraryOptions) void {
+fn compilePunycode(b: *Build, static_options: StaticLibraryOptions) void {
     const lib = b.addStaticLibrary(static_options);
     lib.addIncludePath(b.path("lib"));
     // DEPENDENCIES "core encoding"
@@ -456,7 +378,7 @@ fn compilePunycode(b: *Build, static_options: Build.StaticLibraryOptions) void {
     b.installArtifact(lib);
 }
 
-fn compileSelectors(b: *Build, static_options: Build.StaticLibraryOptions) void {
+fn compileSelectors(b: *Build, static_options: StaticLibraryOptions) void {
     const lib = b.addStaticLibrary(static_options);
     lib.addIncludePath(b.path("lib"));
     // DEPENDENCIES "core dom css tag ns"
@@ -491,7 +413,7 @@ fn compileSelectors(b: *Build, static_options: Build.StaticLibraryOptions) void 
     b.installArtifact(lib);
 }
 
-fn compileTag(b: *Build, static_options: Build.StaticLibraryOptions) void {
+fn compileTag(b: *Build, static_options: StaticLibraryOptions) void {
     const lib = b.addStaticLibrary(static_options);
     lib.addIncludePath(b.path("lib"));
     // DEPENDENCIES "core"
@@ -510,7 +432,7 @@ fn compileTag(b: *Build, static_options: Build.StaticLibraryOptions) void {
     b.installArtifact(lib);
 }
 
-fn compileUnicode(b: *Build, static_options: Build.StaticLibraryOptions) void {
+fn compileUnicode(b: *Build, static_options: StaticLibraryOptions) void {
     const lib = b.addStaticLibrary(static_options);
     lib.addIncludePath(b.path("lib"));
     // DEPENDENCIES "core encoding punycode"
@@ -537,7 +459,7 @@ fn compileUnicode(b: *Build, static_options: Build.StaticLibraryOptions) void {
     b.installArtifact(lib);
 }
 
-fn compileUrl(b: *Build, static_options: Build.StaticLibraryOptions) void {
+fn compileUrl(b: *Build, static_options: StaticLibraryOptions) void {
     const lib = b.addStaticLibrary(static_options);
     lib.addIncludePath(b.path("lib"));
     // DEPENDENCIES "core encoding unicode punycode"
@@ -568,7 +490,7 @@ fn compileUrl(b: *Build, static_options: Build.StaticLibraryOptions) void {
     b.installArtifact(lib);
 }
 
-fn compileUtils(b: *Build, static_options: Build.StaticLibraryOptions) void {
+fn compileUtils(b: *Build, static_options: StaticLibraryOptions) void {
     const lib = b.addStaticLibrary(static_options);
     lib.addIncludePath(b.path("lib"));
     // DEPENDENCIES "core"
@@ -587,7 +509,7 @@ fn compileUtils(b: *Build, static_options: Build.StaticLibraryOptions) void {
     b.installArtifact(lib);
 }
 
-fn compileSingle(b: *Build, static_options: Build.StaticLibraryOptions) *Compile {
+fn compileSingle(b: *Build, static_options: StaticLibraryOptions) *Compile {
     const lib = b.addStaticLibrary(static_options);
     lib.addIncludePath(b.path("lib"));
     // core
