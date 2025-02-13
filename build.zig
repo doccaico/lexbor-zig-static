@@ -31,7 +31,14 @@ pub fn build(b: *std.Build) !void {
         .dom = b.option(bool, "dom", "Build a dom module") orelse defaults.dom,
         .encoding = b.option(bool, "encoding", "Build a encoding module") orelse defaults.encoding,
         .html = b.option(bool, "html", "Build a html module") orelse defaults.html,
+        .ns = b.option(bool, "ns", "Build a ns module") orelse defaults.ns,
         .ports = b.option(bool, "ports", "Build a ports module") orelse defaults.ports,
+        .punycode = b.option(bool, "punycode", "Build a punycode module") orelse defaults.punycode,
+        .selectors = b.option(bool, "selectors", "Build a selectors module") orelse defaults.selectors,
+        .tag = b.option(bool, "tag", "Build a tag module") orelse defaults.tag,
+        .unicode = b.option(bool, "unicode", "Build a unicode module") orelse defaults.unicode,
+        .url = b.option(bool, "url", "Build a url module") orelse defaults.url,
+        .utils = b.option(bool, "utils", "Build a utils module") orelse defaults.utils,
     };
 
     if (try test_and_d_option(b.allocator, &options)) {
@@ -95,9 +102,79 @@ pub fn build(b: *std.Build) !void {
     else
         null;
 
+    const ns: ?*Build.Step.Compile = if (options.ns)
+        compileNs(b, .{
+            .name = "liblexbor-ns",
+            .target = target,
+            .optimize = optimize,
+            .link_libc = true,
+        })
+    else
+        null;
+
     const ports: ?*Build.Step.Compile = if (options.ports)
         compilePorts(b, .{
             .name = "liblexbor-ports",
+            .target = target,
+            .optimize = optimize,
+            .link_libc = true,
+        })
+    else
+        null;
+
+    const punycode: ?*Build.Step.Compile = if (options.punycode)
+        compilePunycode(b, .{
+            .name = "liblexbor-punycode",
+            .target = target,
+            .optimize = optimize,
+            .link_libc = true,
+        })
+    else
+        null;
+
+    const selectors: ?*Build.Step.Compile = if (options.selectors)
+        compileSelectors(b, .{
+            .name = "liblexbor-selectors",
+            .target = target,
+            .optimize = optimize,
+            .link_libc = true,
+        })
+    else
+        null;
+
+    const tag: ?*Build.Step.Compile = if (options.tag)
+        compileTag(b, .{
+            .name = "liblexbor-tag",
+            .target = target,
+            .optimize = optimize,
+            .link_libc = true,
+        })
+    else
+        null;
+
+    const unicode: ?*Build.Step.Compile = if (options.unicode)
+        compileUnicode(b, .{
+            .name = "liblexbor-unicode",
+            .target = target,
+            .optimize = optimize,
+            .link_libc = true,
+        })
+    else
+        null;
+
+    const url: ?*Build.Step.Compile = if (options.url)
+        compileUrl(b, .{
+            .name = "liblexbor-url",
+            .target = target,
+            .optimize = optimize,
+            .link_libc = true,
+        })
+    else
+        null;
+
+    const utils: ?*Build.Step.Compile = if (options.utils)
+        compileUtils(b, .{
+            .name = "liblexbor-utils",
             .target = target,
             .optimize = optimize,
             .link_libc = true,
@@ -136,8 +213,29 @@ pub fn build(b: *std.Build) !void {
     if (options.html) {
         tests.linkLibrary(html.?);
     }
+    if (options.ns) {
+        tests.linkLibrary(ns.?);
+    }
     if (options.ports) {
         tests.linkLibrary(ports.?);
+    }
+    if (options.punycode) {
+        tests.linkLibrary(punycode.?);
+    }
+    if (options.selectors) {
+        tests.linkLibrary(selectors.?);
+    }
+    if (options.tag) {
+        tests.linkLibrary(tag.?);
+    }
+    if (options.unicode) {
+        tests.linkLibrary(unicode.?);
+    }
+    if (options.url) {
+        tests.linkLibrary(url.?);
+    }
+    if (options.utils) {
+        tests.linkLibrary(utils.?);
     }
 
     test_step.dependOn(&b.addRunArtifact(tests).step);
@@ -523,6 +621,22 @@ fn compileHtml(b: *std.Build, static_options: Build.StaticLibraryOptions) *Build
     return lib;
 }
 
+fn compileNs(b: *std.Build, static_options: Build.StaticLibraryOptions) *Build.Step.Compile {
+    const lib = b.addStaticLibrary(static_options);
+    lib.addIncludePath(b.path("lib"));
+    lib.addCSourceFiles(.{
+        .files = &.{
+            "lib/lexbor/ns/ns.c",
+        },
+        .flags = &.{
+            "-std=c99",
+            "-DLEXBOR_STATIC",
+        },
+    });
+    b.installArtifact(lib);
+    return lib;
+}
+
 fn compilePorts(b: *std.Build, static_options: Build.StaticLibraryOptions) *Build.Step.Compile {
     const lib = b.addStaticLibrary(static_options);
     lib.addIncludePath(b.path("lib"));
@@ -534,6 +648,104 @@ fn compilePorts(b: *std.Build, static_options: Build.StaticLibraryOptions) *Buil
         },
         .flags = &.{
             "-Wall", "-pedantic", "-pipe", "-std=c99",
+        },
+    });
+    b.installArtifact(lib);
+    return lib;
+}
+
+fn compilePunycode(b: *std.Build, static_options: Build.StaticLibraryOptions) *Build.Step.Compile {
+    const lib = b.addStaticLibrary(static_options);
+    lib.addIncludePath(b.path("lib"));
+    lib.addCSourceFiles(.{
+        .files = &.{
+            "lib/lexbor/punycode/punycode.c",
+        },
+        .flags = &.{
+            "-std=c99",
+            "-DLEXBOR_STATIC",
+        },
+    });
+    b.installArtifact(lib);
+    return lib;
+}
+
+fn compileSelectors(b: *std.Build, static_options: Build.StaticLibraryOptions) *Build.Step.Compile {
+    const lib = b.addStaticLibrary(static_options);
+    lib.addIncludePath(b.path("lib"));
+    lib.addCSourceFiles(.{
+        .files = &.{
+            "lib/lexbor/selectors/selectors.c",
+        },
+        .flags = &.{
+            "-std=c99",
+            "-DLEXBOR_STATIC",
+        },
+    });
+    b.installArtifact(lib);
+    return lib;
+}
+
+fn compileTag(b: *std.Build, static_options: Build.StaticLibraryOptions) *Build.Step.Compile {
+    const lib = b.addStaticLibrary(static_options);
+    lib.addIncludePath(b.path("lib"));
+    lib.addCSourceFiles(.{
+        .files = &.{
+            "lib/lexbor/tag/tag.c",
+        },
+        .flags = &.{
+            "-std=c99",
+            "-DLEXBOR_STATIC",
+        },
+    });
+    b.installArtifact(lib);
+    return lib;
+}
+
+fn compileUnicode(b: *std.Build, static_options: Build.StaticLibraryOptions) *Build.Step.Compile {
+    const lib = b.addStaticLibrary(static_options);
+    lib.addIncludePath(b.path("lib"));
+    lib.addCSourceFiles(.{
+        .files = &.{
+            "lib/lexbor/unicode/idna.c",
+            "lib/lexbor/unicode/unicode.c",
+        },
+        .flags = &.{
+            "-std=c99",
+            "-DLEXBOR_STATIC",
+        },
+    });
+    b.installArtifact(lib);
+    return lib;
+}
+
+fn compileUrl(b: *std.Build, static_options: Build.StaticLibraryOptions) *Build.Step.Compile {
+    const lib = b.addStaticLibrary(static_options);
+    lib.addIncludePath(b.path("lib"));
+    lib.addCSourceFiles(.{
+        .files = &.{
+            "lib/lexbor/url/url.c",
+        },
+        .flags = &.{
+            "-std=c99",
+            "-DLEXBOR_STATIC",
+        },
+    });
+    b.installArtifact(lib);
+    return lib;
+}
+
+fn compileUtils(b: *std.Build, static_options: Build.StaticLibraryOptions) *Build.Step.Compile {
+    const lib = b.addStaticLibrary(static_options);
+    lib.addIncludePath(b.path("lib"));
+    lib.addCSourceFiles(.{
+        .files = &.{
+            "lib/lexbor/utils/http.c",
+            "lib/lexbor/utils/warc.c",
+        },
+        .flags = &.{
+            "-std=c99",
+            "-DLEXBOR_STATIC",
         },
     });
     b.installArtifact(lib);
