@@ -53,6 +53,7 @@ pub fn build(b: *Build) !void {
     const optimize = b.standardOptimizeOption(.{});
 
     const tests = b.addTest(.{
+        .name = "tests",
         .root_source_file = b.path("test/tests.zig"),
         .target = target,
         .optimize = optimize,
@@ -244,6 +245,12 @@ pub fn build(b: *Build) !void {
         .root_source_file = b.path("src/lexbor.zig"),
     });
     tests.root_module.addImport("lexbor", lib_mod);
+
+    const install_exe_test = b.addInstallArtifact(tests, .{});
+    install_exe_test.step.dependOn(b.getInstallStep());
+
+    const run_exe_tests = b.addRunArtifact(tests);
+    run_exe_tests.step.dependOn(&install_exe_test.step);
 
     b.installArtifact(tests);
 
