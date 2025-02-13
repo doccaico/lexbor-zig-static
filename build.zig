@@ -288,90 +288,78 @@ fn parseOptions(options: *Options) void {
         !options.utils)
     {
         is_single = true;
-        // options.core = true;
-        // options.css = true;
-        // options.dom = true;
-        // options.encoding = true;
-        // options.html = true;
-        // options.ns = true;
-        // options.ports = true;
-        // options.punycode = true;
-        // options.selectors = true;
-        // options.tag = true;
-        // options.unicode = true;
-        // options.url = true;
-        // options.utils = true;
-    } else {
-        if (options.core) {
-            options.core = true;
-            options.ports = true;
-        }
-        if (options.css) {
-            options.core = true;
-            options.css = true;
-            options.ports = true;
-        }
-        if (options.dom) {
-            options.core = true;
-            options.tag = true;
-            options.ns = true;
-            options.ports = true;
-        }
-        if (options.encoding) {
-            options.core = true;
-            options.ports = true;
-        }
-        if (options.html) {
-            options.core = true;
-            options.dom = true;
-            options.ns = true;
-            options.tag = true;
-            options.css = true;
-            options.selectors = true;
-            options.ports = true;
-        }
-        if (options.ns) {
-            options.core = true;
-            options.ports = true;
-        }
-        if (options.ports) {
-            options.core = true;
-            options.ports = true;
-        }
-        if (options.punycode) {
-            options.core = true;
-            options.encoding = true;
-            options.ports = true;
-        }
-        if (options.selectors) {
-            options.core = true;
-            options.dom = true;
-            options.css = true;
-            options.tag = true;
-            options.ns = true;
-            options.ports = true;
-        }
-        if (options.tag) {
-            options.core = true;
-            options.ports = true;
-        }
-        if (options.unicode) {
-            options.core = true;
-            options.encoding = true;
-            options.punycode = true;
-            options.ports = true;
-        }
-        if (options.url) {
-            options.core = true;
-            options.encoding = true;
-            options.unicode = true;
-            options.punycode = true;
-            options.ports = true;
-        }
-        if (options.utils) {
-            options.core = true;
-            options.ports = true;
-        }
+        return;
+    }
+
+    if (options.core) {
+        options.core = true;
+        options.ports = true;
+    }
+    if (options.css) {
+        options.core = true;
+        options.css = true;
+        options.ports = true;
+    }
+    if (options.dom) {
+        options.core = true;
+        options.tag = true;
+        options.ns = true;
+        options.ports = true;
+    }
+    if (options.encoding) {
+        options.core = true;
+        options.ports = true;
+    }
+    if (options.html) {
+        options.core = true;
+        options.dom = true;
+        options.ns = true;
+        options.tag = true;
+        options.css = true;
+        options.selectors = true;
+        options.ports = true;
+    }
+    if (options.ns) {
+        options.core = true;
+        options.ports = true;
+    }
+    if (options.ports) {
+        options.core = true;
+        options.ports = true;
+    }
+    if (options.punycode) {
+        options.core = true;
+        options.encoding = true;
+        options.ports = true;
+    }
+    if (options.selectors) {
+        options.core = true;
+        options.dom = true;
+        options.css = true;
+        options.tag = true;
+        options.ns = true;
+        options.ports = true;
+    }
+    if (options.tag) {
+        options.core = true;
+        options.ports = true;
+    }
+    if (options.unicode) {
+        options.core = true;
+        options.encoding = true;
+        options.punycode = true;
+        options.ports = true;
+    }
+    if (options.url) {
+        options.core = true;
+        options.encoding = true;
+        options.unicode = true;
+        options.punycode = true;
+        options.ports = true;
+    }
+    if (options.utils) {
+        options.core = true;
+        options.ports = true;
     }
 }
 
@@ -578,7 +566,7 @@ fn compileSingle(b: *Build, static_options: Build.StaticLibraryOptions) *Compile
     });
     // url
     lib.addCSourceFiles(.{
-        .files = &unicode_src,
+        .files = &url_src,
         .flags = &cflags,
     });
     // utils
