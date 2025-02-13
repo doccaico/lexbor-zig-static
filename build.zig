@@ -57,6 +57,7 @@ pub fn build(b: *Build) !void {
         .root_source_file = b.path("test/tests.zig"),
         .target = target,
         .optimize = optimize,
+        .link_libc = true,
     });
 
     parseOptions(&options);
@@ -70,175 +71,97 @@ pub fn build(b: *Build) !void {
         });
         tests.linkLibrary(single_lib);
     } else {
-        const core: ?*Compile = if (options.core)
+        if (options.core)
             compileCore(b, .{
                 .name = "liblexbor-core",
                 .target = target,
                 .optimize = optimize,
                 .link_libc = true,
-            })
-        else
-            null;
-
-        const css: ?*Compile = if (options.css)
+            });
+        if (options.css)
             compileCss(b, .{
                 .name = "liblexbor-css",
                 .target = target,
                 .optimize = optimize,
                 .link_libc = true,
-            })
-        else
-            null;
-
-        const dom: ?*Compile = if (options.dom)
+            });
+        if (options.dom)
             compileDom(b, .{
                 .name = "liblexbor-dom",
                 .target = target,
                 .optimize = optimize,
                 .link_libc = true,
-            })
-        else
-            null;
-
-        const encoding: ?*Compile = if (options.encoding)
+            });
+        if (options.encoding)
             compileEncoding(b, .{
                 .name = "liblexbor-encoding",
                 .target = target,
                 .optimize = optimize,
                 .link_libc = true,
-            })
-        else
-            null;
-
-        const html: ?*Compile = if (options.html)
+            });
+        if (options.html)
             compileHtml(b, .{
                 .name = "liblexbor-html",
                 .target = target,
                 .optimize = optimize,
                 .link_libc = true,
-            })
-        else
-            null;
-
-        const ns: ?*Compile = if (options.ns)
+            });
+        if (options.ns)
             compileNs(b, .{
                 .name = "liblexbor-ns",
                 .target = target,
                 .optimize = optimize,
                 .link_libc = true,
-            })
-        else
-            null;
-
-        const ports: ?*Compile = if (options.ports)
+            });
+        if (options.ports)
             compilePorts(b, .{
                 .name = "liblexbor-ports",
                 .target = target,
                 .optimize = optimize,
                 .link_libc = true,
-            })
-        else
-            null;
-
-        const punycode: ?*Compile = if (options.punycode)
+            });
+        if (options.punycode)
             compilePunycode(b, .{
                 .name = "liblexbor-punycode",
                 .target = target,
                 .optimize = optimize,
                 .link_libc = true,
-            })
-        else
-            null;
-
-        const selectors: ?*Compile = if (options.selectors)
+            });
+        if (options.selectors)
             compileSelectors(b, .{
                 .name = "liblexbor-selectors",
                 .target = target,
                 .optimize = optimize,
                 .link_libc = true,
-            })
-        else
-            null;
-
-        const tag: ?*Compile = if (options.tag)
+            });
+        if (options.tag)
             compileTag(b, .{
                 .name = "liblexbor-tag",
                 .target = target,
                 .optimize = optimize,
                 .link_libc = true,
-            })
-        else
-            null;
-
-        const unicode: ?*Compile = if (options.unicode)
+            });
+        if (options.unicode)
             compileUnicode(b, .{
                 .name = "liblexbor-unicode",
                 .target = target,
                 .optimize = optimize,
                 .link_libc = true,
-            })
-        else
-            null;
-
-        const url: ?*Compile = if (options.url)
+            });
+        if (options.url)
             compileUrl(b, .{
                 .name = "liblexbor-url",
                 .target = target,
                 .optimize = optimize,
                 .link_libc = true,
-            })
-        else
-            null;
-
-        const utils: ?*Compile = if (options.utils)
+            });
+        if (options.utils)
             compileUtils(b, .{
                 .name = "liblexbor-utils",
                 .target = target,
                 .optimize = optimize,
                 .link_libc = true,
-            })
-        else
-            null;
-
-        if (options.core) {
-            tests.linkLibrary(core.?);
-        }
-        if (options.css) {
-            tests.linkLibrary(css.?);
-        }
-        if (options.dom) {
-            tests.linkLibrary(dom.?);
-        }
-        if (options.encoding) {
-            tests.linkLibrary(encoding.?);
-        }
-        if (options.html) {
-            tests.linkLibrary(html.?);
-        }
-        if (options.ns) {
-            tests.linkLibrary(ns.?);
-        }
-        if (options.ports) {
-            tests.linkLibrary(ports.?);
-        }
-        if (options.punycode) {
-            tests.linkLibrary(punycode.?);
-        }
-        if (options.selectors) {
-            tests.linkLibrary(selectors.?);
-        }
-        if (options.tag) {
-            tests.linkLibrary(tag.?);
-        }
-        if (options.unicode) {
-            tests.linkLibrary(unicode.?);
-        }
-        if (options.url) {
-            tests.linkLibrary(url.?);
-        }
-        if (options.utils) {
-            tests.linkLibrary(utils.?);
-        }
+            });
     }
 
     const lib_mod = b.addModule("lexbor", .{
@@ -246,13 +169,13 @@ pub fn build(b: *Build) !void {
     });
     tests.root_module.addImport("lexbor", lib_mod);
 
-    const install_exe_test = b.addInstallArtifact(tests, .{});
-    install_exe_test.step.dependOn(b.getInstallStep());
-
-    const run_exe_tests = b.addRunArtifact(tests);
-    run_exe_tests.step.dependOn(&install_exe_test.step);
-
-    b.installArtifact(tests);
+    // const install_exe_test = b.addInstallArtifact(tests, .{});
+    // install_exe_test.step.dependOn(b.getInstallStep());
+    //
+    // const run_exe_tests = b.addRunArtifact(tests);
+    // run_exe_tests.step.dependOn(&install_exe_test.step);
+    //
+    // b.installArtifact(tests);
 
     const test_step = b.step("test", "Run lexbor tests");
     test_step.dependOn(&b.addRunArtifact(tests).step);
@@ -362,7 +285,7 @@ fn parseOptions(options: *Options) void {
     // }
 }
 
-fn compileCore(b: *Build, static_options: Build.StaticLibraryOptions) *Compile {
+fn compileCore(b: *Build, static_options: Build.StaticLibraryOptions) void {
     const lib = b.addStaticLibrary(static_options);
     lib.addIncludePath(b.path("lib"));
     // DEPENDENCIES ""
@@ -375,10 +298,9 @@ fn compileCore(b: *Build, static_options: Build.StaticLibraryOptions) *Compile {
         .flags = &cflags_ports,
     });
     b.installArtifact(lib);
-    return lib;
 }
 
-fn compileCss(b: *Build, static_options: Build.StaticLibraryOptions) *Compile {
+fn compileCss(b: *Build, static_options: Build.StaticLibraryOptions) void {
     const lib = b.addStaticLibrary(static_options);
     lib.addIncludePath(b.path("lib"));
     // DEPENDENCIES "core"
@@ -395,10 +317,9 @@ fn compileCss(b: *Build, static_options: Build.StaticLibraryOptions) *Compile {
         .flags = &cflags,
     });
     b.installArtifact(lib);
-    return lib;
 }
 
-fn compileDom(b: *Build, static_options: Build.StaticLibraryOptions) *Compile {
+fn compileDom(b: *Build, static_options: Build.StaticLibraryOptions) void {
     const lib = b.addStaticLibrary(static_options);
     lib.addIncludePath(b.path("lib"));
     // DEPENDENCIES "core tag ns"
@@ -423,10 +344,9 @@ fn compileDom(b: *Build, static_options: Build.StaticLibraryOptions) *Compile {
         .flags = &cflags,
     });
     b.installArtifact(lib);
-    return lib;
 }
 
-fn compileEncoding(b: *Build, static_options: Build.StaticLibraryOptions) *Compile {
+fn compileEncoding(b: *Build, static_options: Build.StaticLibraryOptions) void {
     const lib = b.addStaticLibrary(static_options);
     lib.addIncludePath(b.path("lib"));
     // DEPENDENCIES "core"
@@ -443,10 +363,9 @@ fn compileEncoding(b: *Build, static_options: Build.StaticLibraryOptions) *Compi
         .flags = &cflags,
     });
     b.installArtifact(lib);
-    return lib;
 }
 
-fn compileHtml(b: *Build, static_options: Build.StaticLibraryOptions) *Compile {
+fn compileHtml(b: *Build, static_options: Build.StaticLibraryOptions) void {
     const lib = b.addStaticLibrary(static_options);
     lib.addIncludePath(b.path("lib"));
     // DEPENDENCIES "core dom ns tag css selectors"
@@ -483,10 +402,9 @@ fn compileHtml(b: *Build, static_options: Build.StaticLibraryOptions) *Compile {
         .flags = &cflags,
     });
     b.installArtifact(lib);
-    return lib;
 }
 
-fn compileNs(b: *Build, static_options: Build.StaticLibraryOptions) *Compile {
+fn compileNs(b: *Build, static_options: Build.StaticLibraryOptions) void {
     const lib = b.addStaticLibrary(static_options);
     lib.addIncludePath(b.path("lib"));
     // DEPENDENCIES "core"
@@ -503,10 +421,9 @@ fn compileNs(b: *Build, static_options: Build.StaticLibraryOptions) *Compile {
         .flags = &cflags,
     });
     b.installArtifact(lib);
-    return lib;
 }
 
-fn compilePorts(b: *Build, static_options: Build.StaticLibraryOptions) *Compile {
+fn compilePorts(b: *Build, static_options: Build.StaticLibraryOptions) void {
     const lib = b.addStaticLibrary(static_options);
     lib.addIncludePath(b.path("lib"));
     lib.addCSourceFiles(.{
@@ -514,10 +431,9 @@ fn compilePorts(b: *Build, static_options: Build.StaticLibraryOptions) *Compile 
         .flags = &cflags_ports,
     });
     b.installArtifact(lib);
-    return lib;
 }
 
-fn compilePunycode(b: *Build, static_options: Build.StaticLibraryOptions) *Compile {
+fn compilePunycode(b: *Build, static_options: Build.StaticLibraryOptions) void {
     const lib = b.addStaticLibrary(static_options);
     lib.addIncludePath(b.path("lib"));
     // DEPENDENCIES "core encoding"
@@ -538,10 +454,9 @@ fn compilePunycode(b: *Build, static_options: Build.StaticLibraryOptions) *Compi
         .flags = &cflags,
     });
     b.installArtifact(lib);
-    return lib;
 }
 
-fn compileSelectors(b: *Build, static_options: Build.StaticLibraryOptions) *Compile {
+fn compileSelectors(b: *Build, static_options: Build.StaticLibraryOptions) void {
     const lib = b.addStaticLibrary(static_options);
     lib.addIncludePath(b.path("lib"));
     // DEPENDENCIES "core dom css tag ns"
@@ -574,10 +489,9 @@ fn compileSelectors(b: *Build, static_options: Build.StaticLibraryOptions) *Comp
         .flags = &cflags,
     });
     b.installArtifact(lib);
-    return lib;
 }
 
-fn compileTag(b: *Build, static_options: Build.StaticLibraryOptions) *Compile {
+fn compileTag(b: *Build, static_options: Build.StaticLibraryOptions) void {
     const lib = b.addStaticLibrary(static_options);
     lib.addIncludePath(b.path("lib"));
     // DEPENDENCIES "core"
@@ -594,10 +508,9 @@ fn compileTag(b: *Build, static_options: Build.StaticLibraryOptions) *Compile {
         .flags = &cflags,
     });
     b.installArtifact(lib);
-    return lib;
 }
 
-fn compileUnicode(b: *Build, static_options: Build.StaticLibraryOptions) *Compile {
+fn compileUnicode(b: *Build, static_options: Build.StaticLibraryOptions) void {
     const lib = b.addStaticLibrary(static_options);
     lib.addIncludePath(b.path("lib"));
     // DEPENDENCIES "core encoding punycode"
@@ -622,10 +535,9 @@ fn compileUnicode(b: *Build, static_options: Build.StaticLibraryOptions) *Compil
         .flags = &cflags,
     });
     b.installArtifact(lib);
-    return lib;
 }
 
-fn compileUrl(b: *Build, static_options: Build.StaticLibraryOptions) *Compile {
+fn compileUrl(b: *Build, static_options: Build.StaticLibraryOptions) void {
     const lib = b.addStaticLibrary(static_options);
     lib.addIncludePath(b.path("lib"));
     // DEPENDENCIES "core encoding unicode punycode"
@@ -654,10 +566,9 @@ fn compileUrl(b: *Build, static_options: Build.StaticLibraryOptions) *Compile {
         .flags = &cflags,
     });
     b.installArtifact(lib);
-    return lib;
 }
 
-fn compileUtils(b: *Build, static_options: Build.StaticLibraryOptions) *Compile {
+fn compileUtils(b: *Build, static_options: Build.StaticLibraryOptions) void {
     const lib = b.addStaticLibrary(static_options);
     lib.addIncludePath(b.path("lib"));
     // DEPENDENCIES "core"
@@ -674,7 +585,6 @@ fn compileUtils(b: *Build, static_options: Build.StaticLibraryOptions) *Compile 
         .flags = &cflags,
     });
     b.installArtifact(lib);
-    return lib;
 }
 
 fn compileSingle(b: *Build, static_options: Build.StaticLibraryOptions) *Compile {

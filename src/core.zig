@@ -70,19 +70,19 @@ pub const array = extern struct {
     }
 };
 
-extern "c" fn lexbor_array_create() ?*array;
-extern "c" fn lexbor_array_init(array: ?*array, size: usize) status;
-extern "c" fn lexbor_array_clean(array: ?*array) void;
-extern "c" fn lexbor_array_destroy(array: ?*array, self_destroy: bool) ?*array;
-extern "c" fn lexbor_array_expand(array: ?*array, up_to: usize) ?*?*anyopaque;
-extern "c" fn lexbor_array_push(array: ?*array, value: ?*anyopaque) status;
-extern "c" fn lexbor_array_pop(array: ?*array) ?*anyopaque;
-extern "c" fn lexbor_array_insert(array: ?*array, idx: usize, value: ?*anyopaque) status;
-extern "c" fn lexbor_array_set(array: ?*array, idx: usize, value: ?*anyopaque) status;
-extern "c" fn lexbor_array_delete(array: ?*array, begin: usize, length: usize) void;
-extern "c" fn lexbor_array_get_noi(array: ?*array, idx: usize) ?*anyopaque;
-extern "c" fn lexbor_array_length_noi(array: ?*array) usize;
-extern "c" fn lexbor_array_size_noi(array: ?*array) usize;
+extern fn lexbor_array_create() ?*array;
+extern fn lexbor_array_init(array: ?*array, size: usize) status;
+extern fn lexbor_array_clean(array: ?*array) void;
+extern fn lexbor_array_destroy(array: ?*array, self_destroy: bool) ?*array;
+extern fn lexbor_array_expand(array: ?*array, up_to: usize) ?*?*anyopaque;
+extern fn lexbor_array_push(array: ?*array, value: ?*anyopaque) status;
+extern fn lexbor_array_pop(array: ?*array) ?*anyopaque;
+extern fn lexbor_array_insert(array: ?*array, idx: usize, value: ?*anyopaque) status;
+extern fn lexbor_array_set(array: ?*array, idx: usize, value: ?*anyopaque) status;
+extern fn lexbor_array_delete(array: ?*array, begin: usize, length: usize) void;
+extern fn lexbor_array_get_noi(array: ?*array, idx: usize) ?*anyopaque;
+extern fn lexbor_array_length_noi(array: ?*array) usize;
+extern fn lexbor_array_size_noi(array: ?*array) usize;
 
 // core/array_obj.h
 
@@ -152,22 +152,22 @@ pub const array_obj = extern struct {
     }
 };
 
-extern "c" fn lexbor_array_obj_create() ?*array_obj;
-extern "c" fn lexbor_array_obj_init(array: ?*array_obj, size: usize, struct_size: usize) status;
-extern "c" fn lexbor_array_obj_clean(array: ?*array_obj) void;
-extern "c" fn lexbor_array_obj_destroy(array: ?*array_obj, self_destroy: bool) ?*array_obj;
-extern "c" fn lexbor_array_obj_expand(array: ?*array_obj, up_to: usize) ?*u8;
-extern "c" fn lexbor_array_obj_push(array: ?*array_obj) ?*anyopaque;
-extern "c" fn lexbor_array_obj_push_wo_cls(array: ?*array_obj) ?*anyopaque;
-extern "c" fn lexbor_array_obj_push_n(array: ?*array_obj, count: usize) ?*anyopaque;
-extern "c" fn lexbor_array_obj_pop(array: ?*array_obj) ?*anyopaque;
-extern "c" fn lexbor_array_obj_delete(array: ?*array_obj, begin: usize, length: usize) void;
-extern "c" fn lexbor_array_obj_erase_noi(array: ?*array_obj) void;
-extern "c" fn lexbor_array_obj_get_noi(array: ?*array_obj, idx: usize) ?*anyopaque;
-extern "c" fn lexbor_array_obj_length_noi(array: ?*array_obj) usize;
-extern "c" fn lexbor_array_obj_size_noi(array: ?*array_obj) usize;
-extern "c" fn lexbor_array_obj_struct_size_noi(array: ?*array_obj) usize;
-extern "c" fn lexbor_array_obj_last_noi(array: ?*array_obj) ?*anyopaque;
+extern fn lexbor_array_obj_create() ?*array_obj;
+extern fn lexbor_array_obj_init(array: ?*array_obj, size: usize, struct_size: usize) status;
+extern fn lexbor_array_obj_clean(array: ?*array_obj) void;
+extern fn lexbor_array_obj_destroy(array: ?*array_obj, self_destroy: bool) ?*array_obj;
+extern fn lexbor_array_obj_expand(array: ?*array_obj, up_to: usize) ?*u8;
+extern fn lexbor_array_obj_push(array: ?*array_obj) ?*anyopaque;
+extern fn lexbor_array_obj_push_wo_cls(array: ?*array_obj) ?*anyopaque;
+extern fn lexbor_array_obj_push_n(array: ?*array_obj, count: usize) ?*anyopaque;
+extern fn lexbor_array_obj_pop(array: ?*array_obj) ?*anyopaque;
+extern fn lexbor_array_obj_delete(array: ?*array_obj, begin: usize, length: usize) void;
+extern fn lexbor_array_obj_erase_noi(array: ?*array_obj) void;
+extern fn lexbor_array_obj_get_noi(array: ?*array_obj, idx: usize) ?*anyopaque;
+extern fn lexbor_array_obj_length_noi(array: ?*array_obj) usize;
+extern fn lexbor_array_obj_size_noi(array: ?*array_obj) usize;
+extern fn lexbor_array_obj_struct_size_noi(array: ?*array_obj) usize;
+extern fn lexbor_array_obj_last_noi(array: ?*array_obj) ?*anyopaque;
 
 // core/avl.h
 
@@ -241,19 +241,19 @@ pub const avl = extern struct {
     }
 };
 
-extern "c" fn lexbor_avl_create() ?*avl;
-extern "c" fn lexbor_avl_init(avl: ?*avl, chunk_len: usize, struct_size: usize) status;
-extern "c" fn lexbor_avl_clean(avl: ?*avl) void;
-extern "c" fn lexbor_avl_destroy(avl: ?*avl, struct_destroy: bool) ?*avl;
-extern "c" fn lexbor_avl_node_make(avl: ?*avl, type: usize, value: ?*anyopaque) ?*avl_node;
-extern "c" fn lexbor_avl_node_clean(node: ?*avl_node) void;
-extern "c" fn lexbor_avl_node_destroy(avl: ?*avl, node: ?*avl_node, self_destroy: bool) ?*avl_node;
-extern "c" fn lexbor_avl_insert(avl: ?*avl, scope: ?*?*avl_node, type: usize, value: ?*anyopaque) ?*avl_node;
-extern "c" fn lexbor_avl_search(avl: ?*avl, scope: ?*avl_node, type: usize) ?*avl_node;
-extern "c" fn lexbor_avl_remove(avl: ?*avl, scope: ?*?*avl_node, type: usize) ?*anyopaque;
-extern "c" fn lexbor_avl_remove_by_node(avl: ?*avl, root: ?*?*avl_node, node: ?*avl_node) void;
-extern "c" fn lexbor_avl_foreach(avl: ?*avl, scope: ?*?*avl_node, cb: avl_node_f, ctx: ?*anyopaque) status;
-extern "c" fn lexbor_avl_foreach_recursion(avl: ?*avl, scope: ?*avl_node, callback: avl_node_f, ctx: ?*anyopaque) void;
+extern fn lexbor_avl_create() ?*avl;
+extern fn lexbor_avl_init(avl: ?*avl, chunk_len: usize, struct_size: usize) status;
+extern fn lexbor_avl_clean(avl: ?*avl) void;
+extern fn lexbor_avl_destroy(avl: ?*avl, struct_destroy: bool) ?*avl;
+extern fn lexbor_avl_node_make(avl: ?*avl, type: usize, value: ?*anyopaque) ?*avl_node;
+extern fn lexbor_avl_node_clean(node: ?*avl_node) void;
+extern fn lexbor_avl_node_destroy(avl: ?*avl, node: ?*avl_node, self_destroy: bool) ?*avl_node;
+extern fn lexbor_avl_insert(avl: ?*avl, scope: ?*?*avl_node, type: usize, value: ?*anyopaque) ?*avl_node;
+extern fn lexbor_avl_search(avl: ?*avl, scope: ?*avl_node, type: usize) ?*avl_node;
+extern fn lexbor_avl_remove(avl: ?*avl, scope: ?*?*avl_node, type: usize) ?*anyopaque;
+extern fn lexbor_avl_remove_by_node(avl: ?*avl, root: ?*?*avl_node, node: ?*avl_node) void;
+extern fn lexbor_avl_foreach(avl: ?*avl, scope: ?*?*avl_node, cb: avl_node_f, ctx: ?*anyopaque) status;
+extern fn lexbor_avl_foreach_recursion(avl: ?*avl, scope: ?*avl_node, callback: avl_node_f, ctx: ?*anyopaque) void;
 
 // core/base.h
 
@@ -382,20 +382,20 @@ pub const bst = extern struct {
     }
 };
 
-extern "c" fn lexbor_bst_create() ?*bst;
-extern "c" fn lexbor_bst_init(bst: ?*bst, size: usize) status;
-extern "c" fn lexbor_bst_clean(bst: ?*bst) void;
-extern "c" fn lexbor_bst_destroy(bst: ?*bst, self_destroy: bool) ?*bst;
-extern "c" fn lexbor_bst_entry_make(bst: ?*bst, size: usize) ?*bst_entry;
-extern "c" fn lexbor_bst_insert(bst: ?*bst, scope: ?*?*bst_entry, size: usize, value: ?*anyopaque) ?*bst_entry;
-extern "c" fn lexbor_bst_insert_not_exists(bst: ?*bst, scope: ?*?*bst_entry, size: usize) ?*bst_entry;
-extern "c" fn lexbor_bst_search(bst: ?*bst, scope: ?*bst_entry, size: usize) ?*bst_entry;
-extern "c" fn lexbor_bst_search_close(bst: ?*bst, scope: ?*bst_entry, size: usize) ?*bst_entry;
-extern "c" fn lexbor_bst_remove(bst: ?*bst, root: ?*?*bst_entry, size: usize) ?*anyopaque;
-extern "c" fn lexbor_bst_remove_close(bst: ?*bst, root: ?*?*bst_entry, size: usize, found_size: ?*usize) ?*anyopaque;
-extern "c" fn lexbor_bst_remove_by_pointer(bst: ?*bst, entry: ?*bst_entry, root: ?*?*bst_entry) ?*anyopaque;
-extern "c" fn lexbor_bst_serialize(bst: ?*bst, callback: callback_f, ctx: ?*anyopaque) void;
-extern "c" fn lexbor_bst_serialize_entry(entry: ?*bst_entry, callback: callback_f, ctx: ?*anyopaque, tabs: usize) void;
+extern fn lexbor_bst_create() ?*bst;
+extern fn lexbor_bst_init(bst: ?*bst, size: usize) status;
+extern fn lexbor_bst_clean(bst: ?*bst) void;
+extern fn lexbor_bst_destroy(bst: ?*bst, self_destroy: bool) ?*bst;
+extern fn lexbor_bst_entry_make(bst: ?*bst, size: usize) ?*bst_entry;
+extern fn lexbor_bst_insert(bst: ?*bst, scope: ?*?*bst_entry, size: usize, value: ?*anyopaque) ?*bst_entry;
+extern fn lexbor_bst_insert_not_exists(bst: ?*bst, scope: ?*?*bst_entry, size: usize) ?*bst_entry;
+extern fn lexbor_bst_search(bst: ?*bst, scope: ?*bst_entry, size: usize) ?*bst_entry;
+extern fn lexbor_bst_search_close(bst: ?*bst, scope: ?*bst_entry, size: usize) ?*bst_entry;
+extern fn lexbor_bst_remove(bst: ?*bst, root: ?*?*bst_entry, size: usize) ?*anyopaque;
+extern fn lexbor_bst_remove_close(bst: ?*bst, root: ?*?*bst_entry, size: usize, found_size: ?*usize) ?*anyopaque;
+extern fn lexbor_bst_remove_by_pointer(bst: ?*bst, entry: ?*bst_entry, root: ?*?*bst_entry) ?*anyopaque;
+extern fn lexbor_bst_serialize(bst: ?*bst, callback: callback_f, ctx: ?*anyopaque) void;
+extern fn lexbor_bst_serialize_entry(entry: ?*bst_entry, callback: callback_f, ctx: ?*anyopaque, tabs: usize) void;
 
 // core/bst_map.h
 
@@ -442,15 +442,15 @@ pub const bst_map = extern struct {
     }
 };
 
-extern "c" fn lexbor_bst_map_create() ?*bst_map;
-extern "c" fn lexbor_bst_map_init(bst_map: ?*bst_map, size: usize) status;
-extern "c" fn lexbor_bst_map_clean(bst_map: ?*bst_map) void;
-extern "c" fn lexbor_bst_map_destroy(bst_map: ?*bst_map, self_destroy: bool) ?*bst_map;
-extern "c" fn lexbor_bst_map_search(bst_map: ?*bst_map, scope: ?*lb.core.bst_entry, key: ?*const char, key_len: usize) ?*bst_map_entry;
-extern "c" fn lexbor_bst_map_insert(bst_map: ?*bst_map, scope: ?*?*lb.core.bst_entry, key: ?*const char, key_len: usize, value: ?*anyopaque) ?*bst_map_entry;
-extern "c" fn lexbor_bst_map_insert_not_exists(bst_map: ?*bst_map, scope: ?*?*lb.core.bst_entry, key: ?*const char, key_len: usize) ?*bst_map_entry;
-extern "c" fn lexbor_bst_map_remove(bst_map: ?*bst_map, scope: ?*?*lb.core.bst_entry, key: ?*const char, key_len: usize) ?*anyopaque;
-extern "c" fn lexbor_bst_map_mraw_noi(bst_map: ?*bst_map) ?*mraw;
+extern fn lexbor_bst_map_create() ?*bst_map;
+extern fn lexbor_bst_map_init(bst_map: ?*bst_map, size: usize) status;
+extern fn lexbor_bst_map_clean(bst_map: ?*bst_map) void;
+extern fn lexbor_bst_map_destroy(bst_map: ?*bst_map, self_destroy: bool) ?*bst_map;
+extern fn lexbor_bst_map_search(bst_map: ?*bst_map, scope: ?*lb.core.bst_entry, key: ?*const char, key_len: usize) ?*bst_map_entry;
+extern fn lexbor_bst_map_insert(bst_map: ?*bst_map, scope: ?*?*lb.core.bst_entry, key: ?*const char, key_len: usize, value: ?*anyopaque) ?*bst_map_entry;
+extern fn lexbor_bst_map_insert_not_exists(bst_map: ?*bst_map, scope: ?*?*lb.core.bst_entry, key: ?*const char, key_len: usize) ?*bst_map_entry;
+extern fn lexbor_bst_map_remove(bst_map: ?*bst_map, scope: ?*?*lb.core.bst_entry, key: ?*const char, key_len: usize) ?*anyopaque;
+extern fn lexbor_bst_map_mraw_noi(bst_map: ?*bst_map) ?*mraw;
 
 // core/conv.h
 
@@ -486,14 +486,14 @@ pub fn conv_dec_to_hex(number: u32, out: ?*char, length: usize) usize {
     return lexbor_conv_dec_to_hex(number, out, length);
 }
 
-extern "c" fn lexbor_conv_float_to_data(num: f64, buf: ?*char, len: usize) usize;
-extern "c" fn lexbor_conv_long_to_data(num: c_long, buf: ?*char, len: usize) usize;
-extern "c" fn lexbor_conv_int64_to_data(num: i64, buf: ?*char, len: usize) usize;
-extern "c" fn lexbor_conv_data_to_double(start: ?*const ?*char, len: usize) f64;
-extern "c" fn lexbor_conv_data_to_ulong(data: ?*const ?*char, length: usize) c_ulong;
-extern "c" fn lexbor_conv_data_to_long(data: ?*const ?*char, length: usize) c_long;
-extern "c" fn lexbor_conv_data_to_uint(data: ?*const ?*char, length: usize) c_uint;
-extern "c" fn lexbor_conv_dec_to_hex(number: u32, out: ?*char, length: usize) usize;
+extern fn lexbor_conv_float_to_data(num: f64, buf: ?*char, len: usize) usize;
+extern fn lexbor_conv_long_to_data(num: c_long, buf: ?*char, len: usize) usize;
+extern fn lexbor_conv_int64_to_data(num: i64, buf: ?*char, len: usize) usize;
+extern fn lexbor_conv_data_to_double(start: ?*const ?*char, len: usize) f64;
+extern fn lexbor_conv_data_to_ulong(data: ?*const ?*char, length: usize) c_ulong;
+extern fn lexbor_conv_data_to_long(data: ?*const ?*char, length: usize) c_long;
+extern fn lexbor_conv_data_to_uint(data: ?*const ?*char, length: usize) c_uint;
+extern fn lexbor_conv_dec_to_hex(number: u32, out: ?*char, length: usize) usize;
 
 pub inline fn conv_double_to_long(number: f64) c_long {
     if (number > std.math.maxInt(c_long)) {
@@ -561,11 +561,11 @@ pub const memory_realloc_f = ?*const fn (dst: ?*anyopaque, size: usize) callconv
 pub const memory_calloc_f = ?*const fn (num: usize, size: usize) callconv(.C) ?*anyopaque;
 pub const memory_free_f = ?*const fn (dst: ?*anyopaque) callconv(.C) void;
 
-extern "c" fn lexbor_malloc(size: usize) ?*anyopaque;
-extern "c" fn lexbor_realloc(dst: *anyopaque, size: usize) ?*anyopaque;
-extern "c" fn lexbor_calloc(num: usize, size: usize) ?*anyopaque;
-extern "c" fn lexbor_free(dst: ?*anyopaque) void;
-extern "c" fn lexbor_memory_setup(new_malloc: memory_malloc_f, new_realloc: memory_realloc_f, new_calloc: memory_calloc_f, new_free: memory_free_f) void;
+extern fn lexbor_malloc(size: usize) ?*anyopaque;
+extern fn lexbor_realloc(dst: *anyopaque, size: usize) ?*anyopaque;
+extern fn lexbor_calloc(num: usize, size: usize) ?*anyopaque;
+extern fn lexbor_free(dst: ?*anyopaque) void;
+extern fn lexbor_memory_setup(new_malloc: memory_malloc_f, new_realloc: memory_realloc_f, new_calloc: memory_calloc_f, new_free: memory_free_f) void;
 
 // core/types.h
 
