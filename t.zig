@@ -6,21 +6,22 @@ const assert = std.debug.assert;
 const expect = std.testing.expect;
 
 pub fn main() !void {
+    var arena: std.heap.ArenaAllocator = undefined;
+
+    arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+    defer arena.deinit();
+    const allocator = arena.allocator();
+
     const args = [_][]const u8{ "zig.exe", "test", "-Dcss=true", "-Dns=true" };
 
-    // const single_example_name = args[args.len - 1];
-    // var index: ?usize = null;
+    var list = std.ArrayList([]const u8).init(allocator);
+    // missing `defer list.deinit();`
+    try list.append("start");
+    try list.appendSlice(args[0..]);
 
-    const is_test = blk: {
-        for (args[1..]) |arg| {
-            if (std.mem.eql(u8, "test", arg)) {
-                break :blk true;
-            }
-        }
-        break :blk false;
-    };
-
-    print("{any}\n", .{is_test});
+    for (list.items) |item| {
+        print("{s}\n", .{item});
+    }
 }
 // zig test filename.zig
 // test "if" {

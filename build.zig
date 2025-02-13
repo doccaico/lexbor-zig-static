@@ -272,14 +272,6 @@ fn testAndDOption(allocator: Allocator, options: *Options) !bool {
     return false;
 }
 
-// fn buildSingle(options: *Options) bool {
-//     if (is_single)
-//     {
-//         return true;
-//     }
-//     return false;
-// }
-
 fn parseOptions(options: *Options) void {
     if (!options.core and !options.css and !options.dom and
         !options.encoding and !options.html and !options.ns and
@@ -291,84 +283,89 @@ fn parseOptions(options: *Options) void {
         return;
     }
 
-    if (options.core) {
-        options.core = true;
-        options.ports = true;
-    }
-    if (options.css) {
-        options.core = true;
-        options.css = true;
-        options.ports = true;
-    }
-    if (options.dom) {
-        options.core = true;
-        options.tag = true;
-        options.ns = true;
-        options.ports = true;
-    }
-    if (options.encoding) {
-        options.core = true;
-        options.ports = true;
-    }
-    if (options.html) {
-        options.core = true;
-        options.dom = true;
-        options.ns = true;
-        options.tag = true;
-        options.css = true;
-        options.selectors = true;
-        options.ports = true;
-    }
-    if (options.ns) {
-        options.core = true;
-        options.ports = true;
-    }
-    if (options.ports) {
-        options.core = true;
-        options.ports = true;
-    }
-    if (options.punycode) {
-        options.core = true;
-        options.encoding = true;
-        options.ports = true;
-    }
-    if (options.selectors) {
-        options.core = true;
-        options.dom = true;
-        options.css = true;
-        options.tag = true;
-        options.ns = true;
-        options.ports = true;
-    }
-    if (options.tag) {
-        options.core = true;
-        options.ports = true;
-    }
-    if (options.unicode) {
-        options.core = true;
-        options.encoding = true;
-        options.punycode = true;
-        options.ports = true;
-    }
-    if (options.url) {
-        options.core = true;
-        options.encoding = true;
-        options.unicode = true;
-        options.punycode = true;
-        options.ports = true;
-    }
-    if (options.utils) {
-        options.core = true;
-        options.ports = true;
-    }
+    // if (options.core) {
+    //     options.core = true;
+    //     options.ports = true;
+    // }
+    // if (options.css) {
+    //     options.core = true;
+    //     options.css = true;
+    //     options.ports = true;
+    // }
+    // if (options.dom) {
+    //     options.core = true;
+    //     options.tag = true;
+    //     options.ns = true;
+    //     options.ports = true;
+    // }
+    // if (options.encoding) {
+    //     options.core = true;
+    //     options.ports = true;
+    // }
+    // if (options.html) {
+    //     options.core = true;
+    //     options.dom = true;
+    //     options.ns = true;
+    //     options.tag = true;
+    //     options.css = true;
+    //     options.selectors = true;
+    //     options.ports = true;
+    // }
+    // if (options.ns) {
+    //     options.core = true;
+    //     options.ports = true;
+    // }
+    // if (options.ports) {
+    //     options.core = true;
+    //     options.ports = true;
+    // }
+    // if (options.punycode) {
+    //     options.core = true;
+    //     options.encoding = true;
+    //     options.ports = true;
+    // }
+    // if (options.selectors) {
+    //     options.core = true;
+    //     options.dom = true;
+    //     options.css = true;
+    //     options.tag = true;
+    //     options.ns = true;
+    //     options.ports = true;
+    // }
+    // if (options.tag) {
+    //     options.core = true;
+    //     options.ports = true;
+    // }
+    // if (options.unicode) {
+    //     options.core = true;
+    //     options.encoding = true;
+    //     options.punycode = true;
+    //     options.ports = true;
+    // }
+    // if (options.url) {
+    //     options.core = true;
+    //     options.encoding = true;
+    //     options.unicode = true;
+    //     options.punycode = true;
+    //     options.ports = true;
+    // }
+    // if (options.utils) {
+    //     options.core = true;
+    //     options.ports = true;
+    // }
 }
 
 fn compileCore(b: *Build, static_options: Build.StaticLibraryOptions) *Compile {
     const lib = b.addStaticLibrary(static_options);
     lib.addIncludePath(b.path("lib"));
+    // DEPENDENCIES ""
     lib.addCSourceFiles(.{
         .files = &core_src,
         .flags = &cflags,
+    });
+    lib.addCSourceFiles(.{
+        .files = &ports_src,
+        .flags = &cflags_ports,
     });
     b.installArtifact(lib);
     return lib;
@@ -377,6 +374,15 @@ fn compileCore(b: *Build, static_options: Build.StaticLibraryOptions) *Compile {
 fn compileCss(b: *Build, static_options: Build.StaticLibraryOptions) *Compile {
     const lib = b.addStaticLibrary(static_options);
     lib.addIncludePath(b.path("lib"));
+    // DEPENDENCIES "core"
+    lib.addCSourceFiles(.{
+        .files = &core_src,
+        .flags = &cflags,
+    });
+    lib.addCSourceFiles(.{
+        .files = &ports_src,
+        .flags = &cflags_ports,
+    });
     lib.addCSourceFiles(.{
         .files = &css_src,
         .flags = &cflags,
@@ -388,6 +394,23 @@ fn compileCss(b: *Build, static_options: Build.StaticLibraryOptions) *Compile {
 fn compileDom(b: *Build, static_options: Build.StaticLibraryOptions) *Compile {
     const lib = b.addStaticLibrary(static_options);
     lib.addIncludePath(b.path("lib"));
+    // DEPENDENCIES "core tag ns"
+    lib.addCSourceFiles(.{
+        .files = &core_src,
+        .flags = &cflags,
+    });
+    lib.addCSourceFiles(.{
+        .files = &ports_src,
+        .flags = &cflags_ports,
+    });
+    lib.addCSourceFiles(.{
+        .files = &tag_src,
+        .flags = &cflags,
+    });
+    lib.addCSourceFiles(.{
+        .files = &ns_src,
+        .flags = &cflags,
+    });
     lib.addCSourceFiles(.{
         .files = &dom_src,
         .flags = &cflags,
@@ -399,6 +422,15 @@ fn compileDom(b: *Build, static_options: Build.StaticLibraryOptions) *Compile {
 fn compileEncoding(b: *Build, static_options: Build.StaticLibraryOptions) *Compile {
     const lib = b.addStaticLibrary(static_options);
     lib.addIncludePath(b.path("lib"));
+    // DEPENDENCIES "core"
+    lib.addCSourceFiles(.{
+        .files = &core_src,
+        .flags = &cflags,
+    });
+    lib.addCSourceFiles(.{
+        .files = &ports_src,
+        .flags = &cflags_ports,
+    });
     lib.addCSourceFiles(.{
         .files = &encoding_src,
         .flags = &cflags,
@@ -410,6 +442,35 @@ fn compileEncoding(b: *Build, static_options: Build.StaticLibraryOptions) *Compi
 fn compileHtml(b: *Build, static_options: Build.StaticLibraryOptions) *Compile {
     const lib = b.addStaticLibrary(static_options);
     lib.addIncludePath(b.path("lib"));
+    // DEPENDENCIES "core dom ns tag css selectors"
+    lib.addCSourceFiles(.{
+        .files = &core_src,
+        .flags = &cflags,
+    });
+    lib.addCSourceFiles(.{
+        .files = &ports_src,
+        .flags = &cflags_ports,
+    });
+    lib.addCSourceFiles(.{
+        .files = &dom_src,
+        .flags = &cflags,
+    });
+    lib.addCSourceFiles(.{
+        .files = &ns_src,
+        .flags = &cflags,
+    });
+    lib.addCSourceFiles(.{
+        .files = &tag_src,
+        .flags = &cflags,
+    });
+    lib.addCSourceFiles(.{
+        .files = &css_src,
+        .flags = &cflags,
+    });
+    lib.addCSourceFiles(.{
+        .files = &selectors_src,
+        .flags = &cflags,
+    });
     lib.addCSourceFiles(.{
         .files = &html_src,
         .flags = &cflags,
@@ -421,6 +482,15 @@ fn compileHtml(b: *Build, static_options: Build.StaticLibraryOptions) *Compile {
 fn compileNs(b: *Build, static_options: Build.StaticLibraryOptions) *Compile {
     const lib = b.addStaticLibrary(static_options);
     lib.addIncludePath(b.path("lib"));
+    // DEPENDENCIES "core"
+    lib.addCSourceFiles(.{
+        .files = &core_src,
+        .flags = &cflags,
+    });
+    lib.addCSourceFiles(.{
+        .files = &ports_src,
+        .flags = &cflags_ports,
+    });
     lib.addCSourceFiles(.{
         .files = &ns_src,
         .flags = &cflags,
@@ -443,6 +513,19 @@ fn compilePorts(b: *Build, static_options: Build.StaticLibraryOptions) *Compile 
 fn compilePunycode(b: *Build, static_options: Build.StaticLibraryOptions) *Compile {
     const lib = b.addStaticLibrary(static_options);
     lib.addIncludePath(b.path("lib"));
+    // DEPENDENCIES "core encoding"
+    lib.addCSourceFiles(.{
+        .files = &core_src,
+        .flags = &cflags,
+    });
+    lib.addCSourceFiles(.{
+        .files = &ports_src,
+        .flags = &cflags_ports,
+    });
+    lib.addCSourceFiles(.{
+        .files = &encoding_src,
+        .flags = &cflags,
+    });
     lib.addCSourceFiles(.{
         .files = &punycode_src,
         .flags = &cflags,
@@ -454,6 +537,31 @@ fn compilePunycode(b: *Build, static_options: Build.StaticLibraryOptions) *Compi
 fn compileSelectors(b: *Build, static_options: Build.StaticLibraryOptions) *Compile {
     const lib = b.addStaticLibrary(static_options);
     lib.addIncludePath(b.path("lib"));
+    // DEPENDENCIES "core dom css tag ns"
+    lib.addCSourceFiles(.{
+        .files = &core_src,
+        .flags = &cflags,
+    });
+    lib.addCSourceFiles(.{
+        .files = &ports_src,
+        .flags = &cflags_ports,
+    });
+    lib.addCSourceFiles(.{
+        .files = &dom_src,
+        .flags = &cflags,
+    });
+    lib.addCSourceFiles(.{
+        .files = &css_src,
+        .flags = &cflags,
+    });
+    lib.addCSourceFiles(.{
+        .files = &tag_src,
+        .flags = &cflags,
+    });
+    lib.addCSourceFiles(.{
+        .files = &ns_src,
+        .flags = &cflags,
+    });
     lib.addCSourceFiles(.{
         .files = &selectors_src,
         .flags = &cflags,
@@ -465,6 +573,15 @@ fn compileSelectors(b: *Build, static_options: Build.StaticLibraryOptions) *Comp
 fn compileTag(b: *Build, static_options: Build.StaticLibraryOptions) *Compile {
     const lib = b.addStaticLibrary(static_options);
     lib.addIncludePath(b.path("lib"));
+    // DEPENDENCIES "core"
+    lib.addCSourceFiles(.{
+        .files = &core_src,
+        .flags = &cflags,
+    });
+    lib.addCSourceFiles(.{
+        .files = &ports_src,
+        .flags = &cflags_ports,
+    });
     lib.addCSourceFiles(.{
         .files = &tag_src,
         .flags = &cflags,
@@ -476,6 +593,23 @@ fn compileTag(b: *Build, static_options: Build.StaticLibraryOptions) *Compile {
 fn compileUnicode(b: *Build, static_options: Build.StaticLibraryOptions) *Compile {
     const lib = b.addStaticLibrary(static_options);
     lib.addIncludePath(b.path("lib"));
+    // DEPENDENCIES "core encoding punycode"
+    lib.addCSourceFiles(.{
+        .files = &core_src,
+        .flags = &cflags,
+    });
+    lib.addCSourceFiles(.{
+        .files = &ports_src,
+        .flags = &cflags_ports,
+    });
+    lib.addCSourceFiles(.{
+        .files = &encoding_src,
+        .flags = &cflags,
+    });
+    lib.addCSourceFiles(.{
+        .files = &punycode_src,
+        .flags = &cflags,
+    });
     lib.addCSourceFiles(.{
         .files = &unicode_src,
         .flags = &cflags,
@@ -487,6 +621,27 @@ fn compileUnicode(b: *Build, static_options: Build.StaticLibraryOptions) *Compil
 fn compileUrl(b: *Build, static_options: Build.StaticLibraryOptions) *Compile {
     const lib = b.addStaticLibrary(static_options);
     lib.addIncludePath(b.path("lib"));
+    // DEPENDENCIES "core encoding unicode punycode"
+    lib.addCSourceFiles(.{
+        .files = &core_src,
+        .flags = &cflags,
+    });
+    lib.addCSourceFiles(.{
+        .files = &ports_src,
+        .flags = &cflags_ports,
+    });
+    lib.addCSourceFiles(.{
+        .files = &encoding_src,
+        .flags = &cflags,
+    });
+    lib.addCSourceFiles(.{
+        .files = &unicode_src,
+        .flags = &cflags,
+    });
+    lib.addCSourceFiles(.{
+        .files = &punycode_src,
+        .flags = &cflags,
+    });
     lib.addCSourceFiles(.{
         .files = &url_src,
         .flags = &cflags,
@@ -498,6 +653,15 @@ fn compileUrl(b: *Build, static_options: Build.StaticLibraryOptions) *Compile {
 fn compileUtils(b: *Build, static_options: Build.StaticLibraryOptions) *Compile {
     const lib = b.addStaticLibrary(static_options);
     lib.addIncludePath(b.path("lib"));
+    // DEPENDENCIES "core"
+    lib.addCSourceFiles(.{
+        .files = &core_src,
+        .flags = &cflags,
+    });
+    lib.addCSourceFiles(.{
+        .files = &ports_src,
+        .flags = &cflags_ports,
+    });
     lib.addCSourceFiles(.{
         .files = &utils_src,
         .flags = &cflags,
