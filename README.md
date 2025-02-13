@@ -10,17 +10,8 @@ zig fetch --save=lexbor https://github.com/doccaico/lexbor-zig-static/archive/<g
 ```zig
 // build.zig
 
-const exe_mod = b.createModule(.{
-    .root_source_file = b.path("src/main.zig"),
-    .target = target,
-    .optimize = optimize,
-});
-
-const exe = b.addExecutable(.{
-    .name = "app",
-    .root_module = exe_mod,
-});
-
+// const exe = b.addExecutable(.{
+// ...
 const lexbor = b.dependency("lexbor", .{
     .target = target,
     .optimize = optimize,
@@ -49,17 +40,8 @@ pub fn main() !void {
 ```zig
 // build.zig
 
-const exe_mod = b.createModule(.{
-    .root_source_file = b.path("src/main.zig"),
-    .target = target,
-    .optimize = optimize,
-});
-
-const exe = b.addExecutable(.{
-    .name = "app",
-    .root_module = exe_mod,
-});
-
+// const exe = b.addExecutable(.{
+// ...
 const lexbor = b.dependency("lexbor", .{
     .target = target,
     .optimize = optimize,
