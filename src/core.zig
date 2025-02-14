@@ -182,7 +182,6 @@ pub const avlNode = extern struct {
     right: ?*avlNode,
     parent: ?*avlNode,
 
-    // renaming: node_clean to clean
     pub fn clean(self: ?*avlNode) void {
         return lexbor_avl_node_clean(self);
     }
@@ -671,7 +670,7 @@ pub const cachedPower = extern struct {
 extern fn lexbor_cached_power_dec(exp: c_int, dec_exp: ?*c_int) diyfp;
 extern fn lexbor_cached_power_bin(exp: c_int, dec_exp: ?*c_int) diyfp;
 
-// core/Dobject.h
+// core/dobject.h
 
 pub const Dobject = extern struct {
     mem: ?*mem,
@@ -732,6 +731,94 @@ extern fn lexbor_dobject_free(Dobject: ?*Dobject, data: ?*anyopaque) ?*anyopaque
 extern fn lexbor_dobject_by_absolute_position(Dobject: ?*Dobject, pos: usize) ?*anyopaque;
 extern fn lexbor_dobject_allocated_noi(Dobject: ?*Dobject) usize;
 extern fn lexbor_dobject_cache_length_noi(Dobject: ?*Dobject) usize;
+
+// core/dtoa.h
+
+pub fn dtoa(value: f64, begin: ?*char, len: usize) usize {
+    return lexbor_dtoa(value, begin, len);
+}
+
+extern fn lexbor_dtoa(value: f64, begin: ?*char, len: usize) usize;
+
+// core/fs.h
+
+pub const fsDirFileF = ?*const fn (fullpath: ?*const char, fullpath_len: usize, filename: ?*const char, filename_len: usize, ctx: ?*anyopaque) callconv(.C) Action;
+
+pub const fsDirOpt = enum(c_int) {
+    undef = 0x00,
+    without_dir = 0x01,
+    without_file = 0x02,
+    without_hidden = 0x04,
+};
+
+pub const fsFileType = enum(c_int) {
+    undef = 0x00,
+    file = 0x01,
+    directory = 0x02,
+    block_device = 0x03,
+    character_device = 0x04,
+    pipe = 0x05,
+    symlink = 0x06,
+    socket = 0x07,
+};
+
+pub fn fsDirRead(dirpath: ?*char, opt: c_int, callback: fsDirFileF, ctx: ?*anyopaque) status {
+    return lexbor_fs_dir_read(dirpath, opt, callback, ctx);
+}
+
+// Name change: I wanted to use "fsFileType", but it was already taken so I added "get" to the name.
+pub fn fsGetFileType(full_path: ?*char) fsFileType {
+    return lexbor_fs_file_type(full_path);
+}
+
+pub fn fsFileEasyRead(full_path: ?*char, len: ?*usize) ?*char {
+    return lexbor_fs_file_easy_read(full_path, len);
+}
+
+extern fn lexbor_fs_dir_read(dirpath: ?*char, opt: c_int, callback: fsDirFileF, ctx: ?*anyopaque) status;
+extern fn lexbor_fs_file_type(full_path: ?*char) fsFileType;
+extern fn lexbor_fs_file_easy_read(full_path: ?*char, len: ?*usize) ?*char;
+
+// core/hash.h
+
+pub const HASH_SHORT_SIZE = 16;
+pub const HASH_TABLE_MIN_SIZE = 32;
+
+pub const hashIdF = ?*const fn (key: ?*char, len: usize) callconv(.C) u32;
+pub const hashCopyF = ?*const fn (hash: ?*Hash, entry: ?*HashEntry, key: ?*char, len: usize) callconv(.C) status;
+pub const hashCmpF = ?*const fn (first: ?*char, second: ?*char, size: usize) callconv(.C) bool;
+
+pub const HashEntry = extern struct {
+    u: extern union {
+        long_str: ?*char,
+        short_str: [HASH_SHORT_SIZE + 1]char,
+    },
+
+    length: usize,
+
+    next: ?*HashEntry,
+};
+
+pub const Hash = extern struct {
+    entries: ?*Dobject,
+    mraw: ?*mraw,
+
+    table: ?*?*HashEntry,
+    table_size: usize,
+
+    struct_size: usize,
+};
+
+pub const HashInsert = extern struct {
+    hash: hashIdF,
+    cmp: hashCmpF,
+    copy: hashCopyF,
+};
+
+pub const HashSearch = extern struct {
+    hash: hashIdF,
+    cmp: hashCmpF,
+};
 
 // core/mem.h
 
