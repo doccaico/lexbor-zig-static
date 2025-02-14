@@ -5,15 +5,21 @@ const expectEqual = std.testing.expectEqual;
 
 const lb = @import("lexbor");
 
+pub const t = struct {
+    a: usize,
+    b: c_char,
+    c: c_int,
+};
+
 test "init" {
-    // var bst_map = lb.core.bst_map.create().?;
-    // const status = bst_map.init(128);
-    //
-    // try expectEqual(status, @intFromEnum(lb.core.Status.ok));
-    //
-    // _ = bst_map.destroy(true);
+    var dobj = lb.core.dobject.create().?;
+    const status = dobj.init(128, @sizeOf(t));
+
+    try expectEqual(status, @intFromEnum(lb.core.Status.ok));
+
+    _ = dobj.destroy(true);
 }
-//
+
 // test "init_null" {
 //     const status = lb.core.bst_map.init(null, 128);
 //     try expectEqual(status, @intFromEnum(lb.core.Status.error_object_is_null));

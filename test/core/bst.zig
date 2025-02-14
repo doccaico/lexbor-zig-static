@@ -98,15 +98,15 @@ test "bst_search_close" {
 
     try test_for_push(&bst);
 
-    entry = bst.search_close(bst.root, 6);
+    entry = bst.searchClose(bst.root, 6);
     try expect(entry != null);
     try expectEqual(entry.?.size, 18);
 
-    entry = bst.search_close(bst.root, 0);
+    entry = bst.searchClose(bst.root, 0);
     try expect(entry != null);
     try expectEqual(entry.?.size, 1);
 
-    entry = bst.search_close(bst.root, 19);
+    entry = bst.searchClose(bst.root, 19);
     try expectEqual(entry, null);
 
     _ = bst.destroy(false);
@@ -134,31 +134,31 @@ test "bst_search_close_more" {
     try expect(bst.insert(&bst.root, 77, @as(*anyopaque, @ptrFromInt(77))) != null);
     try expect(bst.insert(&bst.root, 84, @as(*anyopaque, @ptrFromInt(84))) != null);
 
-    entry = bst.search_close(bst.root, 1);
+    entry = bst.searchClose(bst.root, 1);
     try expect(entry != null);
     try expectEqual(entry.?.size, 2);
 
-    entry = bst.search_close(bst.root, 29);
+    entry = bst.searchClose(bst.root, 29);
     try expect(entry != null);
     try expectEqual(entry.?.size, 30);
 
-    entry = bst.search_close(bst.root, 9);
+    entry = bst.searchClose(bst.root, 9);
     try expect(entry != null);
     try expectEqual(entry.?.size, 18);
 
-    entry = bst.search_close(bst.root, 32);
+    entry = bst.searchClose(bst.root, 32);
     try expect(entry != null);
     try expectEqual(entry.?.size, 33);
 
-    entry = bst.search_close(bst.root, 50);
+    entry = bst.searchClose(bst.root, 50);
     try expect(entry != null);
     try expectEqual(entry.?.size, 58);
 
-    entry = bst.search_close(bst.root, 80);
+    entry = bst.searchClose(bst.root, 80);
     try expect(entry != null);
     try expectEqual(entry.?.size, 84);
 
-    entry = bst.search_close(bst.root, 100);
+    entry = bst.searchClose(bst.root, 100);
     try expectEqual(entry, null);
 
     _ = bst.destroy(false);
@@ -277,7 +277,7 @@ test "bst_remove_close" {
 
     try test_for_push(&bst);
 
-    value = bst.remove_close(&bst.root, 7, null);
+    value = bst.removeClose(&bst.root, 7, null);
     try expect(value != null);
 
     try expectEqual(bst.root.?.size, 5);

@@ -293,15 +293,17 @@ pub const Action = enum(c_int) {
     next = 0x02,
 };
 
-pub const serializeCbF = ?*const fn (data: ?*char, len: usize, ctx: ?*anyopaque) callconv(.C) status;
-pub const serializeCbCpF = ?*const fn (cps: ?*codepoint, len: usize, ctx: ?*anyopaque) callconv(.C) status;
+pub const Serialize = struct {
+    pub const cbF = ?*const fn (data: ?*char, len: usize, ctx: ?*anyopaque) callconv(.C) status;
+    pub const cbCpF = ?*const fn (cps: ?*codepoint, len: usize, ctx: ?*anyopaque) callconv(.C) status;
 
-pub const serializeCtx = extern struct {
-    c: serializeCbF,
-    ctx: ?*anyopaque,
+    pub const ctx = extern struct {
+        c: cbF,
+        ctx: ?*anyopaque,
 
-    opt: isize,
-    count: usize,
+        opt: isize,
+        count: usize,
+    };
 };
 
 // core/bst.h
@@ -318,7 +320,7 @@ pub const bstEntry = extern struct {
 
     size: usize,
 
-    pub fn serialize_entry(self: ?*bstEntry, callback: callback_f, ctx: ?*anyopaque, tabs: usize) void {
+    pub fn serializeEntry(self: ?*bstEntry, callback: callbackF, ctx: ?*anyopaque, tabs: usize) void {
         return lexbor_bst_serialize(self, callback, ctx, tabs);
     }
 };
@@ -345,7 +347,7 @@ pub const bst = extern struct {
         return lexbor_bst_destroy(self, self_destroy);
     }
 
-    pub fn entry_make(self: ?*bst, size: usize) ?*bstEntry {
+    pub fn entryMake(self: ?*bst, size: usize) ?*bstEntry {
         return lexbor_bst_entry_make(self, size);
     }
 
@@ -353,7 +355,7 @@ pub const bst = extern struct {
         return lexbor_bst_insert(self, scope, size, value);
     }
 
-    pub fn insert_not_exists(self: ?*bst, scope: ?*?*bstEntry, size: usize) ?*bstEntry {
+    pub fn insertNotExists(self: ?*bst, scope: ?*?*bstEntry, size: usize) ?*bstEntry {
         return lexbor_bst_insert_not_exists(self, scope, size);
     }
 
@@ -361,7 +363,7 @@ pub const bst = extern struct {
         return lexbor_bst_search(self, scope, size);
     }
 
-    pub fn search_close(self: ?*bst, scope: ?*bstEntry, size: usize) ?*bstEntry {
+    pub fn searchClose(self: ?*bst, scope: ?*bstEntry, size: usize) ?*bstEntry {
         return lexbor_bst_search_close(self, scope, size);
     }
 
@@ -369,15 +371,15 @@ pub const bst = extern struct {
         return lexbor_bst_remove(self, root, size);
     }
 
-    pub fn remove_close(self: ?*bst, root: ?*?*bstEntry, size: usize, found_size: ?*usize) ?*anyopaque {
+    pub fn removeClose(self: ?*bst, root: ?*?*bstEntry, size: usize, found_size: ?*usize) ?*anyopaque {
         return lexbor_bst_remove_close(self, root, size, found_size);
     }
 
-    pub fn remove_by_pointer(self: ?*bst, entry: ?*bstEntry, root: ?*?*bstEntry) ?*anyopaque {
+    pub fn removeByPointer(self: ?*bst, entry: ?*bstEntry, root: ?*?*bstEntry) ?*anyopaque {
         return lexbor_bst_remove_by_pointer(self, entry, root);
     }
 
-    pub fn serialize(self: ?*bst, callback: callback_f, ctx: ?*anyopaque) void {
+    pub fn serialize(self: ?*bst, callback: callbackF, ctx: ?*anyopaque) void {
         return lexbor_bst_serialize(self, callback, ctx);
     }
 };
@@ -394,8 +396,8 @@ extern fn lexbor_bst_search_close(bst: ?*bst, scope: ?*bstEntry, size: usize) ?*
 extern fn lexbor_bst_remove(bst: ?*bst, root: ?*?*bstEntry, size: usize) ?*anyopaque;
 extern fn lexbor_bst_remove_close(bst: ?*bst, root: ?*?*bstEntry, size: usize, found_size: ?*usize) ?*anyopaque;
 extern fn lexbor_bst_remove_by_pointer(bst: ?*bst, entry: ?*bstEntry, root: ?*?*bstEntry) ?*anyopaque;
-extern fn lexbor_bst_serialize(bst: ?*bst, callback: callback_f, ctx: ?*anyopaque) void;
-extern fn lexbor_bst_serialize_entry(entry: ?*bstEntry, callback: callback_f, ctx: ?*anyopaque, tabs: usize) void;
+extern fn lexbor_bst_serialize(bst: ?*bst, callback: callbackF, ctx: ?*anyopaque) void;
+extern fn lexbor_bst_serialize_entry(entry: ?*bstEntry, callback: callbackF, ctx: ?*anyopaque, tabs: usize) void;
 
 // core/bst_map.h
 
@@ -433,7 +435,7 @@ pub const bstMap = extern struct {
         return lexbor_bst_map_insert(self, scope, key, key_len, value);
     }
 
-    pub fn insert_not_exists(self: ?*bstMap, scope: ?*?*bstEntry, key: ?*const char, key_len: usize) ?*bstMapEntry {
+    pub fn insertNotExists(self: ?*bstMap, scope: ?*?*bstEntry, key: ?*const char, key_len: usize) ?*bstMapEntry {
         return lexbor_bst_map_insert_not_exists(self, scope, key, key_len);
     }
 
@@ -454,37 +456,49 @@ extern fn lexbor_bst_map_mraw_noi(bst_map: ?*bstMap) ?*mraw;
 
 // core/conv.h
 
-pub fn convFloatToData(num: f64, buf: ?*char, len: usize) usize {
-    return lexbor_conv_float_to_data(num, buf, len);
-}
+pub const conv = struct {
+    pub fn floatToData(num: f64, buf: ?*char, len: usize) usize {
+        return lexbor_conv_float_to_data(num, buf, len);
+    }
 
-pub fn convLongToData(num: c_long, buf: ?*char, len: usize) usize {
-    return lexbor_conv_long_to_data(num, buf, len);
-}
+    pub fn longToData(num: c_long, buf: ?*char, len: usize) usize {
+        return lexbor_conv_long_to_data(num, buf, len);
+    }
 
-pub fn convInt64ToData(num: i64, buf: ?*char, len: usize) usize {
-    return lexbor_conv_int64_to_data(num, buf, len);
-}
+    pub fn int64ToData(num: i64, buf: ?*char, len: usize) usize {
+        return lexbor_conv_int64_to_data(num, buf, len);
+    }
 
-pub fn convDataToDouble(start: ?*const ?*char, len: usize) f64 {
-    return lexbor_conv_data_to_double(start, len);
-}
+    pub fn dataToDouble(start: ?*const ?*char, len: usize) f64 {
+        return lexbor_conv_data_to_double(start, len);
+    }
 
-pub fn convDataToUlong(data: ?*const ?*char, length: usize) c_ulong {
-    return lexbor_conv_data_to_ulong(data, length);
-}
+    pub fn dataToUlong(data: ?*const ?*char, length: usize) c_ulong {
+        return lexbor_conv_data_to_ulong(data, length);
+    }
 
-pub fn convDataToLong(data: ?*const ?*char, length: usize) c_long {
-    return lexbor_conv_data_to_long(data, length);
-}
+    pub fn dataToLong(data: ?*const ?*char, length: usize) c_long {
+        return lexbor_conv_data_to_long(data, length);
+    }
 
-pub fn convDataToUint(data: ?*const ?*char, length: usize) c_uint {
-    return lexbor_conv_data_to_uint(data, length);
-}
+    pub fn dataToUint(data: ?*const ?*char, length: usize) c_uint {
+        return lexbor_conv_data_to_uint(data, length);
+    }
 
-pub fn convDecToHex(number: u32, out: ?*char, length: usize) usize {
-    return lexbor_conv_dec_to_hex(number, out, length);
-}
+    pub fn decToHex(number: u32, out: ?*char, length: usize) usize {
+        return lexbor_conv_dec_to_hex(number, out, length);
+    }
+
+    pub inline fn doubleToLong(number: f64) c_long {
+        if (number > std.math.maxInt(c_long)) {
+            return std.math.maxInt(c_long);
+        }
+        if (number < std.math.minInt(c_long)) {
+            return -std.math.maxInt(c_long);
+        }
+        return @trunc(number);
+    }
+};
 
 extern fn lexbor_conv_float_to_data(num: f64, buf: ?*char, len: usize) usize;
 extern fn lexbor_conv_long_to_data(num: c_long, buf: ?*char, len: usize) usize;
@@ -494,16 +508,6 @@ extern fn lexbor_conv_data_to_ulong(data: ?*const ?*char, length: usize) c_ulong
 extern fn lexbor_conv_data_to_long(data: ?*const ?*char, length: usize) c_long;
 extern fn lexbor_conv_data_to_uint(data: ?*const ?*char, length: usize) c_uint;
 extern fn lexbor_conv_dec_to_hex(number: u32, out: ?*char, length: usize) usize;
-
-pub inline fn convDoubleToLong(number: f64) c_long {
-    if (number > std.math.maxInt(c_long)) {
-        return std.math.maxInt(c_long);
-    }
-    if (number < std.math.minInt(c_long)) {
-        return -std.math.maxInt(c_long);
-    }
-    return @trunc(number);
-}
 
 // core/def.h
 
@@ -533,6 +537,126 @@ pub const DECIMAL_EXPONENT_DIST = 8;
 pub const diyfp = extern struct {
     significand: u64,
     exp: c_int,
+
+    pub inline fn leadingZeros64(x: u64) u64 {
+        var n: u64 = undefined;
+
+        if (x == 0) {
+            return 64;
+        }
+
+        n = 0;
+
+        while ((x & 0x8000000000000000) == 0) {
+            n += 1;
+            x <<= 1;
+        }
+        return n;
+    }
+
+    pub inline fn fromD2(d: u64) diyfp {
+        var biased_exp: c_int = undefined;
+        var significand: u64 = undefined;
+        var r: diyfp = undefined;
+
+        const U = extern union {
+            d: f64,
+            u64_: u64,
+        };
+        var u = U{};
+
+        u.d = d;
+
+        biased_exp = (u.u64_ & DBL_EXPONENT_MASK) >> DBL_SIGNIFICAND_SIZE;
+        significand = u.u64_ & DBL_SIGNIFICAND_MASK;
+
+        if (biased_exp != 0) {
+            r.significand = significand + DBL_HIDDEN_BIT;
+            r.exp = biased_exp - DBL_EXPONENT_BIAS;
+        } else {
+            r.significand = significand;
+            r.exp = DBL_EXPONENT_MIN + 1;
+        }
+
+        return r;
+    }
+
+    pub inline fn @"2d"(v: diyfp) f64 {
+        var exp: c_int = undefined;
+        var significand: u64 = undefined;
+        var biased_exp: u64 = undefined;
+
+        const U = extern union {
+            d: f64,
+            u64_: u64,
+        };
+        var u = U{};
+
+        exp = v.exp;
+        significand = v.significand;
+
+        while (significand > DBL_HIDDEN_BIT + DBL_SIGNIFICAND_MASK) {
+            significand >>= 1;
+            exp += 1;
+        }
+
+        if (exp >= DBL_EXPONENT_MAX) {
+            return std.math.inf(f64);
+        }
+
+        if (exp < DBL_EXPONENT_DENORMAL) {
+            return 0.0;
+        }
+
+        while (exp > DBL_EXPONENT_DENORMAL and (significand & DBL_HIDDEN_BIT) == 0) {
+            significand <<= 1;
+            exp -= 1;
+        }
+
+        if (exp == DBL_EXPONENT_DENORMAL and (significand & DBL_HIDDEN_BIT) == 0) {
+            biased_exp = 0;
+        } else {
+            biased_exp = @intCast(exp + DBL_EXPONENT_BIAS);
+        }
+
+        u.u64_ = (significand & DBL_SIGNIFICAND_MASK) | (biased_exp << DBL_SIGNIFICAND_SIZE);
+
+        return u.d;
+    }
+
+    pub inline fn shiftLeft(v: diyfp, shift: c_uint) diyfp {
+        return diyfp{ .significand = v.significand << shift, .exp = v.exp - shift };
+    }
+
+    pub inline fn shiftRight(v: diyfp, shift: c_uint) diyfp {
+        return diyfp{ .significand = v.significand >> shift, .exp = v.exp + shift };
+    }
+
+    pub inline fn sub(lhs: diyfp, rhs: diyfp) diyfp {
+        return diyfp{ .significand = lhs.significand - rhs.significand, .exp = lhs.exp };
+    }
+
+    pub inline fn mul(lhs: diyfp, rhs: diyfp) diyfp {
+        const a: u64 = lhs.significand >> 32;
+        const b: u64 = lhs.significand & 0xffffffff;
+        const c: u64 = rhs.significand >> 32;
+        const d: u64 = rhs.significand & 0xffffffff;
+
+        const ac: u64 = a * c;
+        const bc: u64 = b * c;
+        const ad: u64 = a * d;
+        const bd: u64 = b * d;
+
+        var tmp: u64 = (bd >> 32) + (ad & 0xffffffff) + (bc & 0xffffffff);
+
+        tmp += @as(c_uint, 1) << 31;
+
+        return diyfp{ .significand = ac + (ad >> 32) + (bc >> 32) + (tmp >> 32), .exp = lhs.exp + rhs.exp + 64 };
+    }
+
+    pub inline fn normalize(v: diyfp) diyfp {
+        return shiftLeft(v, leadingZeros64(v.significand));
+    }
 };
 
 pub fn cachedPowerDec(exp: c_int, dec_exp: ?*c_int) diyfp {
@@ -546,126 +670,6 @@ pub fn cachedPowerBin(exp: c_int, dec_exp: ?*c_int) diyfp {
 extern fn lexbor_cached_power_dec(exp: c_int, dec_exp: ?*c_int) diyfp;
 extern fn lexbor_cached_power_bin(exp: c_int, dec_exp: ?*c_int) diyfp;
 
-pub inline fn diyfpLeadingZeros64(x: u64) u64 {
-    var n: u64 = undefined;
-
-    if (x == 0) {
-        return 64;
-    }
-
-    n = 0;
-
-    while ((x & 0x8000000000000000) == 0) {
-        n += 1;
-        x <<= 1;
-    }
-    return n;
-}
-
-pub inline fn diyfpFromD2(d: u64) diyfp {
-    var biased_exp: c_int = undefined;
-    var significand: u64 = undefined;
-    var r: diyfp = undefined;
-
-    const U = extern union {
-        d: f64,
-        u64_: u64,
-    };
-    var u = U{};
-
-    u.d = d;
-
-    biased_exp = (u.u64_ & DBL_EXPONENT_MASK) >> DBL_SIGNIFICAND_SIZE;
-    significand = u.u64_ & DBL_SIGNIFICAND_MASK;
-
-    if (biased_exp != 0) {
-        r.significand = significand + DBL_HIDDEN_BIT;
-        r.exp = biased_exp - DBL_EXPONENT_BIAS;
-    } else {
-        r.significand = significand;
-        r.exp = DBL_EXPONENT_MIN + 1;
-    }
-
-    return r;
-}
-
-pub inline fn diyfp2d(v: diyfp) f64 {
-    var exp: c_int = undefined;
-    var significand: u64 = undefined;
-    var biased_exp: u64 = undefined;
-
-    const U = extern union {
-        d: f64,
-        u64_: u64,
-    };
-    var u = U{};
-
-    exp = v.exp;
-    significand = v.significand;
-
-    while (significand > DBL_HIDDEN_BIT + DBL_SIGNIFICAND_MASK) {
-        significand >>= 1;
-        exp += 1;
-    }
-
-    if (exp >= DBL_EXPONENT_MAX) {
-        return std.math.inf(f64);
-    }
-
-    if (exp < DBL_EXPONENT_DENORMAL) {
-        return 0.0;
-    }
-
-    while (exp > DBL_EXPONENT_DENORMAL and (significand & DBL_HIDDEN_BIT) == 0) {
-        significand <<= 1;
-        exp -= 1;
-    }
-
-    if (exp == DBL_EXPONENT_DENORMAL and (significand & DBL_HIDDEN_BIT) == 0) {
-        biased_exp = 0;
-    } else {
-        biased_exp = @intCast(exp + DBL_EXPONENT_BIAS);
-    }
-
-    u.u64_ = (significand & DBL_SIGNIFICAND_MASK) | (biased_exp << DBL_SIGNIFICAND_SIZE);
-
-    return u.d;
-}
-
-pub inline fn diyfpShiftLeft(v: diyfp, shift: c_uint) diyfp {
-    return diyfp{ .significand = v.significand << shift, .exp = v.exp - shift };
-}
-
-pub inline fn diyfpShiftRight(v: diyfp, shift: c_uint) diyfp {
-    return diyfp{ .significand = v.significand >> shift, .exp = v.exp + shift };
-}
-
-pub inline fn diyfpSub(lhs: diyfp, rhs: diyfp) diyfp {
-    return diyfp{ .significand = lhs.significand - rhs.significand, .exp = lhs.exp };
-}
-
-pub inline fn diyfpMul(lhs: diyfp, rhs: diyfp) diyfp {
-    const a: u64 = lhs.significand >> 32;
-    const b: u64 = lhs.significand & 0xffffffff;
-    const c: u64 = rhs.significand >> 32;
-    const d: u64 = rhs.significand & 0xffffffff;
-
-    const ac: u64 = a * c;
-    const bc: u64 = b * c;
-    const ad: u64 = a * d;
-    const bd: u64 = b * d;
-
-    var tmp: u64 = (bd >> 32) + (ad & 0xffffffff) + (bc & 0xffffffff);
-
-    tmp += @as(c_uint, 1) << 31;
-
-    return diyfp{ .significand = ac + (ad >> 32) + (bc >> 32) + (tmp >> 32), .exp = lhs.exp + rhs.exp + 64 };
-}
-
-pub inline fn diyfpNormalize(v: diyfp) diyfp {
-    return diyfpShiftLeft(v, diyfpLeadingZeros64(v.significand));
-}
-
 // core/dobject.h
 
 pub const dobject = extern struct {
@@ -674,25 +678,74 @@ pub const dobject = extern struct {
 
     allocated: usize,
     struct_size: usize,
+
+    pub fn create() ?*dobject {
+        return lexbor_dobject_create();
+    }
+
+    pub fn init(self: ?*dobject, chunk_size: usize, struct_size: usize) status {
+        return lexbor_dobject_init(self, chunk_size, struct_size);
+    }
+
+    pub fn clean(self: ?*dobject) void {
+        return lexbor_dobject_clean(self);
+    }
+
+    pub fn destroy(self: ?*dobject, destroy_self: bool) ?*dobject {
+        return lexbor_dobject_destroy(self, destroy_self);
+    }
+
+    pub fn initListEntries(self: ?*dobject, pos: usize) ?*u8 {
+        return lexbor_dobject_init(self, pos);
+    }
+
+    pub fn alloc(self: ?*dobject) ?*anyopaque {
+        return lexbor_dobject_alloc(self);
+    }
+
+    pub fn calloc(self: ?*dobject) ?*anyopaque {
+        return lexbor_dobject_calloc(self);
+    }
+
+    pub fn free(self: ?*dobject, data: ?*anyopaque) ?*anyopaque {
+        return lexbor_dobject_free(self, data);
+    }
+
+    pub fn ByAbsolutePosition(self: ?*dobject, pos: usize) ?*anyopaque {
+        return lexbor_dobject_by_absolute_position(self, pos);
+    }
+
+    pub fn cacheLength(self: ?*dobject) usize {
+        return self.?.cache.length;
+    }
 };
 
 extern fn lexbor_dobject_create() ?*dobject;
-// extern fn lexbor_dobject_create() ?*dobject;
+extern fn lexbor_dobject_init(dobject: ?*dobject, chunk_size: usize, struct_size: usize) status;
+extern fn lexbor_dobject_clean(dobject: ?*dobject) void;
+extern fn lexbor_dobject_destroy(dobject: ?*dobject, destroy_self: bool) ?*dobject;
+extern fn lexbor_dobject_init_list_entries(dobject: ?*dobject, pos: usize) ?*u8;
+extern fn lexbor_dobject_alloc(dobject: ?*dobject) ?*anyopaque;
+extern fn lexbor_dobject_calloc(dobject: ?*dobject) ?*anyopaque;
+extern fn lexbor_dobject_free(dobject: ?*dobject, data: ?*anyopaque) ?*anyopaque;
+extern fn lexbor_dobject_by_absolute_position(dobject: ?*dobject, pos: usize) ?*anyopaque;
+extern fn lexbor_dobject_allocated_noi(dobject: ?*dobject) usize;
+extern fn lexbor_dobject_cache_length_noi(dobject: ?*dobject) usize;
 
 // core/mem.h
 
-pub const mem_chunk = extern struct {
+pub const memChunk = extern struct {
     data: ?*u8,
     length: usize,
     size: usize,
 
-    next: ?*mem_chunk,
-    prev: ?*mem_chunk,
+    next: ?*memChunk,
+    prev: ?*memChunk,
 };
 
 pub const mem = extern struct {
-    chunk: ?*mem_chunk,
-    chunk_first: ?*mem_chunk,
+    chunk: ?*memChunk,
+    chunk_first: ?*memChunk,
 
     chunk_min_size: usize,
     chunk_length: usize,
@@ -700,36 +753,38 @@ pub const mem = extern struct {
 
 // core/lexbor.h
 
-pub fn memory_malloc(size: usize) ?*anyopaque {
-    return lexbor_malloc(size);
-}
+pub const memory = struct {
+    pub const mallocF = ?*const fn (size: usize) callconv(.C) ?*anyopaque;
+    pub const reallocF = ?*const fn (dst: ?*anyopaque, size: usize) callconv(.C) ?*anyopaque;
+    pub const callocF = ?*const fn (num: usize, size: usize) callconv(.C) ?*anyopaque;
+    pub const freeF = ?*const fn (dst: ?*anyopaque) callconv(.C) void;
 
-pub fn memory_realloc(dst: ?*anyopaque, size: usize) ?*anyopaque {
-    return lexbor_realloc(dst, size);
-}
+    pub fn malloc(size: usize) ?*anyopaque {
+        return lexbor_malloc(size);
+    }
 
-pub fn memory_calloc(num: usize, size: usize) ?*anyopaque {
-    return lexbor_calloc(num, size);
-}
+    pub fn realloc(dst: ?*anyopaque, size: usize) ?*anyopaque {
+        return lexbor_realloc(dst, size);
+    }
 
-pub fn memory_free(dst: ?*anyopaque) void {
-    lexbor_free(dst);
-}
+    pub fn calloc(num: usize, size: usize) ?*anyopaque {
+        return lexbor_calloc(num, size);
+    }
 
-pub fn memory_setup(new_malloc: memory_malloc_f, new_realloc: memory_realloc_f, new_calloc: memory_calloc_f, new_free: memory_free_f) void {
-    lexbor_memory_setup(new_malloc, new_realloc, new_calloc, new_free);
-}
+    pub fn free(dst: ?*anyopaque) void {
+        lexbor_free(dst);
+    }
 
-pub const memory_malloc_f = ?*const fn (size: usize) callconv(.C) ?*anyopaque;
-pub const memory_realloc_f = ?*const fn (dst: ?*anyopaque, size: usize) callconv(.C) ?*anyopaque;
-pub const memory_calloc_f = ?*const fn (num: usize, size: usize) callconv(.C) ?*anyopaque;
-pub const memory_free_f = ?*const fn (dst: ?*anyopaque) callconv(.C) void;
+    pub fn setup(new_malloc: mallocF, new_realloc: reallocF, new_calloc: callocF, new_free: freeF) void {
+        lexbor_memory_setup(new_malloc, new_realloc, new_calloc, new_free);
+    }
+};
 
 extern fn lexbor_malloc(size: usize) ?*anyopaque;
 extern fn lexbor_realloc(dst: *anyopaque, size: usize) ?*anyopaque;
 extern fn lexbor_calloc(num: usize, size: usize) ?*anyopaque;
 extern fn lexbor_free(dst: ?*anyopaque) void;
-extern fn lexbor_memory_setup(new_malloc: memory_malloc_f, new_realloc: memory_realloc_f, new_calloc: memory_calloc_f, new_free: memory_free_f) void;
+extern fn lexbor_memory_setup(new_malloc: memory.mallocF, new_realloc: memory.reallocF, new_calloc: memory.callocF, new_free: memory.freeF) void;
 
 // core/types.h
 
@@ -737,7 +792,7 @@ pub const codepoint = u32;
 pub const char = u8;
 pub const status = c_uint;
 
-pub const callback_f = ?*const fn (buffer: ?*char, size: usize, ctx: ?*anyopaque) callconv(.C) status;
+pub const callbackF = ?*const fn (buffer: ?*char, size: usize, ctx: ?*anyopaque) callconv(.C) status;
 
 // core/mraw.h
 

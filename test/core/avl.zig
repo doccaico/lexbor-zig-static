@@ -1118,7 +1118,7 @@ test "foreach_4" {
         _ = avl.insert(&root, i, null);
     }
 
-    t.result = @ptrCast(@alignCast(lb.core.memory_malloc(10 * @sizeOf(usize))));
+    t.result = @ptrCast(@alignCast(lb.core.memory.malloc(10 * @sizeOf(usize))));
     try expect(t.result != null);
 
     t.remove = 4;
@@ -1135,7 +1135,7 @@ test "foreach_4" {
         p = @ptrFromInt(@intFromPtr(p) + @sizeOf(usize));
     }
 
-    lb.core.memory_free(t.result);
+    lb.core.memory.free(t.result);
     _ = avl.destroy(false);
 }
 
@@ -1151,7 +1151,7 @@ test "foreach_6" {
         _ = avl.insert(&root, i, null);
     }
 
-    t.result = @ptrCast(@alignCast(lb.core.memory_malloc(10 * @sizeOf(usize))));
+    t.result = @ptrCast(@alignCast(lb.core.memory.malloc(10 * @sizeOf(usize))));
     try expect(t.result != null);
 
     t.remove = 6;
@@ -1167,7 +1167,7 @@ test "foreach_6" {
         p = @ptrFromInt(@intFromPtr(p) + @sizeOf(usize));
     }
 
-    lb.core.memory_free(t.result);
+    lb.core.memory.free(t.result);
     _ = avl.destroy(false);
 }
 
@@ -1179,7 +1179,7 @@ test "foreach_10" {
 
     const total: usize = 101;
 
-    t.result = @ptrCast(@alignCast(lb.core.memory_malloc(total * @sizeOf(usize))));
+    t.result = @ptrCast(@alignCast(lb.core.memory.malloc(total * @sizeOf(usize))));
     try expect(t.result != null);
 
     for (1..total) |r| {
@@ -1209,5 +1209,5 @@ test "foreach_10" {
         _ = avl.destroy(false);
     }
 
-    lb.core.memory_free(t.result);
+    lb.core.memory.free(t.result);
 }
