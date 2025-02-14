@@ -189,7 +189,7 @@ pub const avlNode = extern struct {
 };
 
 pub const avl = extern struct {
-    nodes: ?*dobject,
+    nodes: ?*Dobject,
     last_right: ?*avlNode,
 
     pub fn create() ?*avl {
@@ -325,7 +325,7 @@ pub const bstEntry = extern struct {
 };
 
 pub const bst = extern struct {
-    dobject: ?*dobject,
+    Dobject: ?*Dobject,
     root: ?*bstEntry,
 
     tree_length: usize,
@@ -408,7 +408,7 @@ pub const bstMapEntry = extern struct {
 pub const bstMap = extern struct {
     bst: ?*bst,
     mraw: ?*mraw,
-    entries: ?*dobject,
+    entries: ?*Dobject,
 
     pub fn create() ?*bstMap {
         return lexbor_bst_map_create();
@@ -671,67 +671,67 @@ pub const cachedPower = extern struct {
 extern fn lexbor_cached_power_dec(exp: c_int, dec_exp: ?*c_int) diyfp;
 extern fn lexbor_cached_power_bin(exp: c_int, dec_exp: ?*c_int) diyfp;
 
-// core/dobject.h
+// core/Dobject.h
 
-pub const dobject = extern struct {
+pub const Dobject = extern struct {
     mem: ?*mem,
     cache: ?*Array,
 
     allocated: usize,
     struct_size: usize,
 
-    pub fn create() ?*dobject {
+    pub fn create() ?*Dobject {
         return lexbor_dobject_create();
     }
 
-    pub fn init(self: ?*dobject, chunk_size: usize, struct_size: usize) status {
+    pub fn init(self: ?*Dobject, chunk_size: usize, struct_size: usize) status {
         return lexbor_dobject_init(self, chunk_size, struct_size);
     }
 
-    pub fn clean(self: ?*dobject) void {
+    pub fn clean(self: ?*Dobject) void {
         return lexbor_dobject_clean(self);
     }
 
-    pub fn destroy(self: ?*dobject, destroy_self: bool) ?*dobject {
+    pub fn destroy(self: ?*Dobject, destroy_self: bool) ?*Dobject {
         return lexbor_dobject_destroy(self, destroy_self);
     }
 
-    pub fn initListEntries(self: ?*dobject, pos: usize) ?*u8 {
+    pub fn initListEntries(self: ?*Dobject, pos: usize) ?*u8 {
         return lexbor_dobject_init(self, pos);
     }
 
-    pub fn alloc(self: ?*dobject) ?*anyopaque {
+    pub fn alloc(self: ?*Dobject) ?*anyopaque {
         return lexbor_dobject_alloc(self);
     }
 
-    pub fn calloc(self: ?*dobject) ?*anyopaque {
+    pub fn calloc(self: ?*Dobject) ?*anyopaque {
         return lexbor_dobject_calloc(self);
     }
 
-    pub fn free(self: ?*dobject, data: ?*anyopaque) ?*anyopaque {
+    pub fn free(self: ?*Dobject, data: ?*anyopaque) ?*anyopaque {
         return lexbor_dobject_free(self, data);
     }
 
-    pub fn byAbsolutePosition(self: ?*dobject, pos: usize) ?*anyopaque {
+    pub fn byAbsolutePosition(self: ?*Dobject, pos: usize) ?*anyopaque {
         return lexbor_dobject_by_absolute_position(self, pos);
     }
 
-    pub fn cacheLength(self: ?*dobject) usize {
+    pub fn cacheLength(self: ?*Dobject) usize {
         return self.?.cache.?.length;
     }
 };
 
-extern fn lexbor_dobject_create() ?*dobject;
-extern fn lexbor_dobject_init(dobject: ?*dobject, chunk_size: usize, struct_size: usize) status;
-extern fn lexbor_dobject_clean(dobject: ?*dobject) void;
-extern fn lexbor_dobject_destroy(dobject: ?*dobject, destroy_self: bool) ?*dobject;
-extern fn lexbor_dobject_init_list_entries(dobject: ?*dobject, pos: usize) ?*u8;
-extern fn lexbor_dobject_alloc(dobject: ?*dobject) ?*anyopaque;
-extern fn lexbor_dobject_calloc(dobject: ?*dobject) ?*anyopaque;
-extern fn lexbor_dobject_free(dobject: ?*dobject, data: ?*anyopaque) ?*anyopaque;
-extern fn lexbor_dobject_by_absolute_position(dobject: ?*dobject, pos: usize) ?*anyopaque;
-extern fn lexbor_dobject_allocated_noi(dobject: ?*dobject) usize;
-extern fn lexbor_dobject_cache_length_noi(dobject: ?*dobject) usize;
+extern fn lexbor_dobject_create() ?*Dobject;
+extern fn lexbor_dobject_init(Dobject: ?*Dobject, chunk_size: usize, struct_size: usize) status;
+extern fn lexbor_dobject_clean(Dobject: ?*Dobject) void;
+extern fn lexbor_dobject_destroy(Dobject: ?*Dobject, destroy_self: bool) ?*Dobject;
+extern fn lexbor_dobject_init_list_entries(Dobject: ?*Dobject, pos: usize) ?*u8;
+extern fn lexbor_dobject_alloc(Dobject: ?*Dobject) ?*anyopaque;
+extern fn lexbor_dobject_calloc(Dobject: ?*Dobject) ?*anyopaque;
+extern fn lexbor_dobject_free(Dobject: ?*Dobject, data: ?*anyopaque) ?*anyopaque;
+extern fn lexbor_dobject_by_absolute_position(Dobject: ?*Dobject, pos: usize) ?*anyopaque;
+extern fn lexbor_dobject_allocated_noi(Dobject: ?*Dobject) usize;
+extern fn lexbor_dobject_cache_length_noi(Dobject: ?*Dobject) usize;
 
 // core/mem.h
 
