@@ -676,6 +676,9 @@ pub const dobject = extern struct {
     struct_size: usize,
 };
 
+extern fn lexbor_dobject_create() ?*dobject;
+// extern fn lexbor_dobject_create() ?*dobject;
+
 // core/mem.h
 
 pub const mem_chunk = extern struct {
