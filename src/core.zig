@@ -5,146 +5,146 @@ const lb = @import("lexbor.zig");
 
 // core/array.h
 
-pub const array = extern struct {
+pub const Array = extern struct {
     list: ?[*]?*anyopaque,
     size: usize,
     length: usize,
 
-    pub fn create() ?*array {
+    pub fn create() ?*Array {
         return lexbor_array_create();
     }
 
-    pub fn init(self: ?*array, size: usize) status {
+    pub fn init(self: ?*Array, size: usize) status {
         return lexbor_array_init(self, size);
     }
 
-    pub fn clean(self: ?*array) void {
+    pub fn clean(self: ?*Array) void {
         return lexbor_array_clean(self);
     }
 
-    pub fn destroy(self: ?*array, self_destroy: bool) ?*array {
+    pub fn destroy(self: ?*Array, self_destroy: bool) ?*Array {
         return lexbor_array_destroy(self, self_destroy);
     }
 
-    pub fn expand(self: ?*array, up_to: usize) ?*?*anyopaque {
+    pub fn expand(self: ?*Array, up_to: usize) ?*?*anyopaque {
         return lexbor_array_expand(self, up_to);
     }
 
-    pub fn push(self: ?*array, value: ?*anyopaque) status {
+    pub fn push(self: ?*Array, value: ?*anyopaque) status {
         return lexbor_array_push(self, value);
     }
 
-    pub fn pop(self: ?*array) ?*anyopaque {
+    pub fn pop(self: ?*Array) ?*anyopaque {
         return lexbor_array_pop(self);
     }
 
-    pub fn insert(self: ?*array, idx: usize, value: ?*anyopaque) status {
+    pub fn insert(self: ?*Array, idx: usize, value: ?*anyopaque) status {
         return lexbor_array_insert(self, idx, value);
     }
 
-    pub fn set(self: ?*array, idx: usize, value: ?*anyopaque) status {
+    pub fn set(self: ?*Array, idx: usize, value: ?*anyopaque) status {
         return lexbor_array_set(self, idx, value);
     }
 
-    pub fn delete(self: ?*array, begin: usize, length: usize) void {
+    pub fn delete(self: ?*Array, begin: usize, length: usize) void {
         return lexbor_array_delete(self, begin, length);
     }
 
-    pub inline fn get(self: ?*array, idx: usize) ?*anyopaque {
+    pub inline fn get(self: ?*Array, idx: usize) ?*anyopaque {
         if (idx >= self.?.length) {
             return null;
         }
         return self.?.list.?[idx];
     }
 
-    pub fn get_noi(self: ?*array, idx: usize) ?*anyopaque {
+    pub fn getNoi(self: ?*Array, idx: usize) ?*anyopaque {
         return lexbor_array_get_noi(self, idx);
     }
 
-    pub fn length_noi(self: ?*array) usize {
+    pub fn lengthNoi(self: ?*Array) usize {
         return lexbor_array_length_noi(self);
     }
 
-    pub fn size_noi(self: ?*array) usize {
+    pub fn sizeNoi(self: ?*Array) usize {
         return lexbor_array_size_noi(self);
     }
 };
 
-extern fn lexbor_array_create() ?*array;
-extern fn lexbor_array_init(array: ?*array, size: usize) status;
-extern fn lexbor_array_clean(array: ?*array) void;
-extern fn lexbor_array_destroy(array: ?*array, self_destroy: bool) ?*array;
-extern fn lexbor_array_expand(array: ?*array, up_to: usize) ?*?*anyopaque;
-extern fn lexbor_array_push(array: ?*array, value: ?*anyopaque) status;
-extern fn lexbor_array_pop(array: ?*array) ?*anyopaque;
-extern fn lexbor_array_insert(array: ?*array, idx: usize, value: ?*anyopaque) status;
-extern fn lexbor_array_set(array: ?*array, idx: usize, value: ?*anyopaque) status;
-extern fn lexbor_array_delete(array: ?*array, begin: usize, length: usize) void;
-extern fn lexbor_array_get_noi(array: ?*array, idx: usize) ?*anyopaque;
-extern fn lexbor_array_length_noi(array: ?*array) usize;
-extern fn lexbor_array_size_noi(array: ?*array) usize;
+extern fn lexbor_array_create() ?*Array;
+extern fn lexbor_array_init(Array: ?*Array, size: usize) status;
+extern fn lexbor_array_clean(Array: ?*Array) void;
+extern fn lexbor_array_destroy(Array: ?*Array, self_destroy: bool) ?*Array;
+extern fn lexbor_array_expand(Array: ?*Array, up_to: usize) ?*?*anyopaque;
+extern fn lexbor_array_push(Array: ?*Array, value: ?*anyopaque) status;
+extern fn lexbor_array_pop(Array: ?*Array) ?*anyopaque;
+extern fn lexbor_array_insert(Array: ?*Array, idx: usize, value: ?*anyopaque) status;
+extern fn lexbor_array_set(Array: ?*Array, idx: usize, value: ?*anyopaque) status;
+extern fn lexbor_array_delete(Array: ?*Array, begin: usize, length: usize) void;
+extern fn lexbor_array_get_noi(Array: ?*Array, idx: usize) ?*anyopaque;
+extern fn lexbor_array_length_noi(Array: ?*Array) usize;
+extern fn lexbor_array_size_noi(Array: ?*Array) usize;
 
 // core/array_obj.h
 
-pub const array_obj = extern struct {
+pub const ArrayObj = extern struct {
     list: ?[*]u8,
     size: usize,
     length: usize,
     struct_size: usize,
 
-    pub fn create() ?*array_obj {
+    pub fn create() ?*ArrayObj {
         return lexbor_array_obj_create();
     }
 
-    pub fn init(self: ?*array_obj, size: usize, struct_size: usize) status {
+    pub fn init(self: ?*ArrayObj, size: usize, struct_size: usize) status {
         return lexbor_array_obj_init(self, size, struct_size);
     }
 
-    pub fn clean(self: ?*array_obj) void {
+    pub fn clean(self: ?*ArrayObj) void {
         return lexbor_array_obj_clean(self);
     }
 
-    pub fn destroy(self: ?*array_obj, self_destroy: bool) ?*array_obj {
+    pub fn destroy(self: ?*ArrayObj, self_destroy: bool) ?*ArrayObj {
         return lexbor_array_obj_destroy(self, self_destroy);
     }
 
-    pub fn expand(self: ?*array_obj, up_to: usize) ?*u8 {
+    pub fn expand(self: ?*ArrayObj, up_to: usize) ?*u8 {
         return lexbor_array_obj_expand(self, up_to);
     }
 
-    pub fn push(self: ?*array_obj) ?*anyopaque {
+    pub fn push(self: ?*ArrayObj) ?*anyopaque {
         return lexbor_array_obj_push(self);
     }
 
-    pub fn push_wo_cls(self: ?*array_obj) ?*anyopaque {
+    pub fn pushWoCls(self: ?*ArrayObj) ?*anyopaque {
         return lexbor_array_obj_push_wo_cls(self);
     }
 
-    pub fn push_n(self: ?*array_obj, count: usize) ?*anyopaque {
+    pub fn pushN(self: ?*ArrayObj, count: usize) ?*anyopaque {
         return lexbor_array_obj_push_wo_cls(self, count);
     }
 
-    pub fn pop(self: ?*array_obj) ?*anyopaque {
+    pub fn pop(self: ?*ArrayObj) ?*anyopaque {
         return lexbor_array_obj_pop(self);
     }
 
-    pub fn delete(self: ?*array_obj, begin: usize, length: usize) void {
+    pub fn delete(self: ?*ArrayObj, begin: usize, length: usize) void {
         return lexbor_array_obj_delete(self, begin, length);
     }
 
-    pub inline fn erase(self: ?*array_obj) void {
+    pub inline fn erase(self: ?*ArrayObj) void {
         const slice = std.mem.asBytes(self.?);
         @memset(slice, 0);
     }
 
-    pub inline fn get(self: ?*array_obj, idx: usize) ?*anyopaque {
+    pub inline fn get(self: ?*ArrayObj, idx: usize) ?*anyopaque {
         if (idx >= self.?.length) {
             return null;
         }
         return self.?.list.? + (idx * self.?.struct_size);
     }
 
-    pub inline fn last(self: ?*array_obj) ?*anyopaque {
+    pub inline fn last(self: ?*ArrayObj) ?*anyopaque {
         if (self.?.length == 0) {
             return null;
         }
@@ -152,45 +152,45 @@ pub const array_obj = extern struct {
     }
 };
 
-extern fn lexbor_array_obj_create() ?*array_obj;
-extern fn lexbor_array_obj_init(array: ?*array_obj, size: usize, struct_size: usize) status;
-extern fn lexbor_array_obj_clean(array: ?*array_obj) void;
-extern fn lexbor_array_obj_destroy(array: ?*array_obj, self_destroy: bool) ?*array_obj;
-extern fn lexbor_array_obj_expand(array: ?*array_obj, up_to: usize) ?*u8;
-extern fn lexbor_array_obj_push(array: ?*array_obj) ?*anyopaque;
-extern fn lexbor_array_obj_push_wo_cls(array: ?*array_obj) ?*anyopaque;
-extern fn lexbor_array_obj_push_n(array: ?*array_obj, count: usize) ?*anyopaque;
-extern fn lexbor_array_obj_pop(array: ?*array_obj) ?*anyopaque;
-extern fn lexbor_array_obj_delete(array: ?*array_obj, begin: usize, length: usize) void;
-extern fn lexbor_array_obj_erase_noi(array: ?*array_obj) void;
-extern fn lexbor_array_obj_get_noi(array: ?*array_obj, idx: usize) ?*anyopaque;
-extern fn lexbor_array_obj_length_noi(array: ?*array_obj) usize;
-extern fn lexbor_array_obj_size_noi(array: ?*array_obj) usize;
-extern fn lexbor_array_obj_struct_size_noi(array: ?*array_obj) usize;
-extern fn lexbor_array_obj_last_noi(array: ?*array_obj) ?*anyopaque;
+extern fn lexbor_array_obj_create() ?*ArrayObj;
+extern fn lexbor_array_obj_init(array: ?*ArrayObj, size: usize, struct_size: usize) status;
+extern fn lexbor_array_obj_clean(array: ?*ArrayObj) void;
+extern fn lexbor_array_obj_destroy(array: ?*ArrayObj, self_destroy: bool) ?*ArrayObj;
+extern fn lexbor_array_obj_expand(array: ?*ArrayObj, up_to: usize) ?*u8;
+extern fn lexbor_array_obj_push(array: ?*ArrayObj) ?*anyopaque;
+extern fn lexbor_array_obj_push_wo_cls(array: ?*ArrayObj) ?*anyopaque;
+extern fn lexbor_array_obj_push_n(array: ?*ArrayObj, count: usize) ?*anyopaque;
+extern fn lexbor_array_obj_pop(array: ?*ArrayObj) ?*anyopaque;
+extern fn lexbor_array_obj_delete(array: ?*ArrayObj, begin: usize, length: usize) void;
+extern fn lexbor_array_obj_erase_noi(array: ?*ArrayObj) void;
+extern fn lexbor_array_obj_get_noi(array: ?*ArrayObj, idx: usize) ?*anyopaque;
+extern fn lexbor_array_obj_length_noi(array: ?*ArrayObj) usize;
+extern fn lexbor_array_obj_size_noi(array: ?*ArrayObj) usize;
+extern fn lexbor_array_obj_struct_size_noi(array: ?*ArrayObj) usize;
+extern fn lexbor_array_obj_last_noi(array: ?*ArrayObj) ?*anyopaque;
 
 // core/avl.h
 
-pub const avl_node_f = ?*const fn (avl: ?*avl, root: ?*?*avl_node, node: ?*avl_node, ctx: ?*anyopaque) callconv(.C) status;
+pub const avlNodeF = ?*const fn (avl: ?*avl, root: ?*?*avlNode, node: ?*avlNode, ctx: ?*anyopaque) callconv(.C) status;
 
-pub const avl_node = extern struct {
+pub const avlNode = extern struct {
     type: usize,
     height: c_short,
     value: ?*anyopaque,
 
-    left: ?*avl_node,
-    right: ?*avl_node,
-    parent: ?*avl_node,
+    left: ?*avlNode,
+    right: ?*avlNode,
+    parent: ?*avlNode,
 
     // renaming: node_clean to clean
-    pub fn clean(self: ?*avl_node) void {
+    pub fn clean(self: ?*avlNode) void {
         return lexbor_avl_node_clean(self);
     }
 };
 
 pub const avl = extern struct {
     nodes: ?*dobject,
-    last_right: ?*avl_node,
+    last_right: ?*avlNode,
 
     pub fn create() ?*avl {
         return lexbor_avl_create();
@@ -208,35 +208,35 @@ pub const avl = extern struct {
         return lexbor_avl_destroy(self, self_destroy);
     }
 
-    pub fn node_make(self: ?*avl, @"type": usize, value: ?*anyopaque) ?*avl_node {
+    pub fn nodeMake(self: ?*avl, @"type": usize, value: ?*anyopaque) ?*avlNode {
         return lexbor_avl_node_make(self, @"type", value);
     }
 
-    pub fn node_destroy(self: ?*avl, node: ?*avl_node, self_destroy: bool) ?*avl_node {
+    pub fn nodeDestroy(self: ?*avl, node: ?*avlNode, self_destroy: bool) ?*avlNode {
         return lexbor_avl_node_destroy(self, node, self_destroy);
     }
 
-    pub fn insert(self: ?*avl, scope: ?*?*avl_node, @"type": usize, value: ?*anyopaque) ?*avl_node {
+    pub fn insert(self: ?*avl, scope: ?*?*avlNode, @"type": usize, value: ?*anyopaque) ?*avlNode {
         return lexbor_avl_insert(self, scope, @"type", value);
     }
 
-    pub fn search(self: ?*avl, scope: ?*avl_node, @"type": usize) ?*avl_node {
+    pub fn search(self: ?*avl, scope: ?*avlNode, @"type": usize) ?*avlNode {
         return lexbor_avl_search(self, scope, @"type");
     }
 
-    pub fn remove(self: ?*avl, scope: ?*?*avl_node, @"type": usize) ?*anyopaque {
+    pub fn remove(self: ?*avl, scope: ?*?*avlNode, @"type": usize) ?*anyopaque {
         return lexbor_avl_remove(self, scope, @"type");
     }
 
-    pub fn remove_by_node(self: ?*avl, root: ?*?*avl_node, node: ?*avl_node) void {
+    pub fn removeByNode(self: ?*avl, root: ?*?*avlNode, node: ?*avlNode) void {
         lexbor_avl_remove_by_node(self, root, node);
     }
 
-    pub fn foreach(self: ?*avl, scope: ?*?*avl_node, cb: avl_node_f, ctx: ?*anyopaque) status {
+    pub fn foreach(self: ?*avl, scope: ?*?*avlNode, cb: avlNodeF, ctx: ?*anyopaque) status {
         return lexbor_avl_foreach(self, scope, cb, ctx);
     }
 
-    pub fn foreach_recursion(self: ?*avl, scope: ?*avl_node, callback: avl_node_f, ctx: ?*anyopaque) void {
+    pub fn foreachRecursion(self: ?*avl, scope: ?*avlNode, callback: avlNodeF, ctx: ?*anyopaque) void {
         lexbor_avl_foreach_recursion(self, scope, callback, ctx);
     }
 };
@@ -245,15 +245,15 @@ extern fn lexbor_avl_create() ?*avl;
 extern fn lexbor_avl_init(avl: ?*avl, chunk_len: usize, struct_size: usize) status;
 extern fn lexbor_avl_clean(avl: ?*avl) void;
 extern fn lexbor_avl_destroy(avl: ?*avl, struct_destroy: bool) ?*avl;
-extern fn lexbor_avl_node_make(avl: ?*avl, type: usize, value: ?*anyopaque) ?*avl_node;
-extern fn lexbor_avl_node_clean(node: ?*avl_node) void;
-extern fn lexbor_avl_node_destroy(avl: ?*avl, node: ?*avl_node, self_destroy: bool) ?*avl_node;
-extern fn lexbor_avl_insert(avl: ?*avl, scope: ?*?*avl_node, type: usize, value: ?*anyopaque) ?*avl_node;
-extern fn lexbor_avl_search(avl: ?*avl, scope: ?*avl_node, type: usize) ?*avl_node;
-extern fn lexbor_avl_remove(avl: ?*avl, scope: ?*?*avl_node, type: usize) ?*anyopaque;
-extern fn lexbor_avl_remove_by_node(avl: ?*avl, root: ?*?*avl_node, node: ?*avl_node) void;
-extern fn lexbor_avl_foreach(avl: ?*avl, scope: ?*?*avl_node, cb: avl_node_f, ctx: ?*anyopaque) status;
-extern fn lexbor_avl_foreach_recursion(avl: ?*avl, scope: ?*avl_node, callback: avl_node_f, ctx: ?*anyopaque) void;
+extern fn lexbor_avl_node_make(avl: ?*avl, type: usize, value: ?*anyopaque) ?*avlNode;
+extern fn lexbor_avl_node_clean(node: ?*avlNode) void;
+extern fn lexbor_avl_node_destroy(avl: ?*avl, node: ?*avlNode, self_destroy: bool) ?*avlNode;
+extern fn lexbor_avl_insert(avl: ?*avl, scope: ?*?*avlNode, type: usize, value: ?*anyopaque) ?*avlNode;
+extern fn lexbor_avl_search(avl: ?*avl, scope: ?*avlNode, type: usize) ?*avlNode;
+extern fn lexbor_avl_remove(avl: ?*avl, scope: ?*?*avlNode, type: usize) ?*anyopaque;
+extern fn lexbor_avl_remove_by_node(avl: ?*avl, root: ?*?*avlNode, node: ?*avlNode) void;
+extern fn lexbor_avl_foreach(avl: ?*avl, scope: ?*?*avlNode, cb: avlNodeF, ctx: ?*anyopaque) status;
+extern fn lexbor_avl_foreach_recursion(avl: ?*avl, scope: ?*avlNode, callback: avlNodeF, ctx: ?*anyopaque) void;
 
 // core/base.h
 
@@ -293,11 +293,11 @@ pub const Action = enum(c_int) {
     next = 0x02,
 };
 
-pub const serialize_cb_f = ?*const fn (data: ?*char, len: usize, ctx: ?*anyopaque) callconv(.C) status;
-pub const serialize_cb_cp_f = ?*const fn (cps: ?*codepoint, len: usize, ctx: ?*anyopaque) callconv(.C) status;
+pub const serializeCbF = ?*const fn (data: ?*char, len: usize, ctx: ?*anyopaque) callconv(.C) status;
+pub const serializeCbCpF = ?*const fn (cps: ?*codepoint, len: usize, ctx: ?*anyopaque) callconv(.C) status;
 
-pub const serialize_ctx = extern struct {
-    c: serialize_cb_f,
+pub const serializeCtx = extern struct {
+    c: serializeCbF,
     ctx: ?*anyopaque,
 
     opt: isize,
@@ -306,26 +306,26 @@ pub const serialize_ctx = extern struct {
 
 // core/bst.h
 
-pub const bst_entry_f = ?*const fn (bst: ?*bst, entry: ?*bst_entry, ctx: ?*anyopaque) callconv(.C) bool;
+pub const bstEntryF = ?*const fn (bst: ?*bst, entry: ?*bstEntry, ctx: ?*anyopaque) callconv(.C) bool;
 
-pub const bst_entry = extern struct {
+pub const bstEntry = extern struct {
     value: ?*anyopaque,
 
-    right: ?*bst_entry,
-    left: ?*bst_entry,
-    next: ?*bst_entry,
-    parent: ?*bst_entry,
+    right: ?*bstEntry,
+    left: ?*bstEntry,
+    next: ?*bstEntry,
+    parent: ?*bstEntry,
 
     size: usize,
 
-    pub fn serialize_entry(self: ?*bst_entry, callback: callback_f, ctx: ?*anyopaque, tabs: usize) void {
+    pub fn serialize_entry(self: ?*bstEntry, callback: callback_f, ctx: ?*anyopaque, tabs: usize) void {
         return lexbor_bst_serialize(self, callback, ctx, tabs);
     }
 };
 
 pub const bst = extern struct {
     dobject: ?*dobject,
-    root: ?*bst_entry,
+    root: ?*bstEntry,
 
     tree_length: usize,
 
@@ -345,35 +345,35 @@ pub const bst = extern struct {
         return lexbor_bst_destroy(self, self_destroy);
     }
 
-    pub fn entry_make(self: ?*bst, size: usize) ?*bst_entry {
+    pub fn entry_make(self: ?*bst, size: usize) ?*bstEntry {
         return lexbor_bst_entry_make(self, size);
     }
 
-    pub fn insert(self: ?*bst, scope: ?*?*bst_entry, size: usize, value: ?*anyopaque) ?*bst_entry {
+    pub fn insert(self: ?*bst, scope: ?*?*bstEntry, size: usize, value: ?*anyopaque) ?*bstEntry {
         return lexbor_bst_insert(self, scope, size, value);
     }
 
-    pub fn insert_not_exists(self: ?*bst, scope: ?*?*bst_entry, size: usize) ?*bst_entry {
+    pub fn insert_not_exists(self: ?*bst, scope: ?*?*bstEntry, size: usize) ?*bstEntry {
         return lexbor_bst_insert_not_exists(self, scope, size);
     }
 
-    pub fn search(self: ?*bst, scope: ?*bst_entry, size: usize) ?*bst_entry {
+    pub fn search(self: ?*bst, scope: ?*bstEntry, size: usize) ?*bstEntry {
         return lexbor_bst_search(self, scope, size);
     }
 
-    pub fn search_close(self: ?*bst, scope: ?*bst_entry, size: usize) ?*bst_entry {
+    pub fn search_close(self: ?*bst, scope: ?*bstEntry, size: usize) ?*bstEntry {
         return lexbor_bst_search_close(self, scope, size);
     }
 
-    pub fn remove(self: ?*bst, root: ?*?*bst_entry, size: usize) ?*anyopaque {
+    pub fn remove(self: ?*bst, root: ?*?*bstEntry, size: usize) ?*anyopaque {
         return lexbor_bst_remove(self, root, size);
     }
 
-    pub fn remove_close(self: ?*bst, root: ?*?*bst_entry, size: usize, found_size: ?*usize) ?*anyopaque {
+    pub fn remove_close(self: ?*bst, root: ?*?*bstEntry, size: usize, found_size: ?*usize) ?*anyopaque {
         return lexbor_bst_remove_close(self, root, size, found_size);
     }
 
-    pub fn remove_by_pointer(self: ?*bst, entry: ?*bst_entry, root: ?*?*bst_entry) ?*anyopaque {
+    pub fn remove_by_pointer(self: ?*bst, entry: ?*bstEntry, root: ?*?*bstEntry) ?*anyopaque {
         return lexbor_bst_remove_by_pointer(self, entry, root);
     }
 
@@ -386,103 +386,103 @@ extern fn lexbor_bst_create() ?*bst;
 extern fn lexbor_bst_init(bst: ?*bst, size: usize) status;
 extern fn lexbor_bst_clean(bst: ?*bst) void;
 extern fn lexbor_bst_destroy(bst: ?*bst, self_destroy: bool) ?*bst;
-extern fn lexbor_bst_entry_make(bst: ?*bst, size: usize) ?*bst_entry;
-extern fn lexbor_bst_insert(bst: ?*bst, scope: ?*?*bst_entry, size: usize, value: ?*anyopaque) ?*bst_entry;
-extern fn lexbor_bst_insert_not_exists(bst: ?*bst, scope: ?*?*bst_entry, size: usize) ?*bst_entry;
-extern fn lexbor_bst_search(bst: ?*bst, scope: ?*bst_entry, size: usize) ?*bst_entry;
-extern fn lexbor_bst_search_close(bst: ?*bst, scope: ?*bst_entry, size: usize) ?*bst_entry;
-extern fn lexbor_bst_remove(bst: ?*bst, root: ?*?*bst_entry, size: usize) ?*anyopaque;
-extern fn lexbor_bst_remove_close(bst: ?*bst, root: ?*?*bst_entry, size: usize, found_size: ?*usize) ?*anyopaque;
-extern fn lexbor_bst_remove_by_pointer(bst: ?*bst, entry: ?*bst_entry, root: ?*?*bst_entry) ?*anyopaque;
+extern fn lexbor_bst_entry_make(bst: ?*bst, size: usize) ?*bstEntry;
+extern fn lexbor_bst_insert(bst: ?*bst, scope: ?*?*bstEntry, size: usize, value: ?*anyopaque) ?*bstEntry;
+extern fn lexbor_bst_insert_not_exists(bst: ?*bst, scope: ?*?*bstEntry, size: usize) ?*bstEntry;
+extern fn lexbor_bst_search(bst: ?*bst, scope: ?*bstEntry, size: usize) ?*bstEntry;
+extern fn lexbor_bst_search_close(bst: ?*bst, scope: ?*bstEntry, size: usize) ?*bstEntry;
+extern fn lexbor_bst_remove(bst: ?*bst, root: ?*?*bstEntry, size: usize) ?*anyopaque;
+extern fn lexbor_bst_remove_close(bst: ?*bst, root: ?*?*bstEntry, size: usize, found_size: ?*usize) ?*anyopaque;
+extern fn lexbor_bst_remove_by_pointer(bst: ?*bst, entry: ?*bstEntry, root: ?*?*bstEntry) ?*anyopaque;
 extern fn lexbor_bst_serialize(bst: ?*bst, callback: callback_f, ctx: ?*anyopaque) void;
-extern fn lexbor_bst_serialize_entry(entry: ?*bst_entry, callback: callback_f, ctx: ?*anyopaque, tabs: usize) void;
+extern fn lexbor_bst_serialize_entry(entry: ?*bstEntry, callback: callback_f, ctx: ?*anyopaque, tabs: usize) void;
 
 // core/bst_map.h
 
-pub const bst_map_entry = extern struct {
+pub const bstMapEntry = extern struct {
     str: str,
     value: ?*anyopaque,
 };
 
-pub const bst_map = extern struct {
+pub const bstMap = extern struct {
     bst: ?*bst,
     mraw: ?*mraw,
     entries: ?*dobject,
 
-    pub fn create() ?*bst_map {
+    pub fn create() ?*bstMap {
         return lexbor_bst_map_create();
     }
 
-    pub fn init(self: ?*bst_map, size: usize) status {
+    pub fn init(self: ?*bstMap, size: usize) status {
         return lexbor_bst_map_init(self, size);
     }
 
-    pub fn clean(self: ?*bst_map) void {
+    pub fn clean(self: ?*bstMap) void {
         return lexbor_bst_map_clean(self);
     }
 
-    pub fn destroy(self: ?*bst_map, self_destroy: bool) ?*bst_map {
+    pub fn destroy(self: ?*bstMap, self_destroy: bool) ?*bstMap {
         return lexbor_bst_map_destroy(self, self_destroy);
     }
 
-    pub fn search(self: ?*bst_map, scope: ?*lb.core.bst_entry, key: ?*const char, key_len: usize) ?*bst_map_entry {
+    pub fn search(self: ?*bstMap, scope: ?*bstEntry, key: ?*const char, key_len: usize) ?*bstMapEntry {
         return lexbor_bst_map_search(self, scope, key, key_len);
     }
 
-    pub fn insert(self: ?*bst_map, scope: ?*?*lb.core.bst_entry, key: ?*const char, key_len: usize, value: ?*anyopaque) ?*bst_map_entry {
+    pub fn insert(self: ?*bstMap, scope: ?*?*bstEntry, key: ?*const char, key_len: usize, value: ?*anyopaque) ?*bstMapEntry {
         return lexbor_bst_map_insert(self, scope, key, key_len, value);
     }
 
-    pub fn insert_not_exists(self: ?*bst_map, scope: ?*?*lb.core.bst_entry, key: ?*const char, key_len: usize) ?*bst_map_entry {
+    pub fn insert_not_exists(self: ?*bstMap, scope: ?*?*bstEntry, key: ?*const char, key_len: usize) ?*bstMapEntry {
         return lexbor_bst_map_insert_not_exists(self, scope, key, key_len);
     }
 
-    pub fn remove(self: ?*bst_map, scope: ?*?*lb.core.bst_entry, key: ?*const char, key_len: usize) ?*anyopaque {
+    pub fn remove(self: ?*bstMap, scope: ?*?*bstEntry, key: ?*const char, key_len: usize) ?*anyopaque {
         return lexbor_bst_map_remove(self, scope, key, key_len);
     }
 };
 
-extern fn lexbor_bst_map_create() ?*bst_map;
-extern fn lexbor_bst_map_init(bst_map: ?*bst_map, size: usize) status;
-extern fn lexbor_bst_map_clean(bst_map: ?*bst_map) void;
-extern fn lexbor_bst_map_destroy(bst_map: ?*bst_map, self_destroy: bool) ?*bst_map;
-extern fn lexbor_bst_map_search(bst_map: ?*bst_map, scope: ?*lb.core.bst_entry, key: ?*const char, key_len: usize) ?*bst_map_entry;
-extern fn lexbor_bst_map_insert(bst_map: ?*bst_map, scope: ?*?*lb.core.bst_entry, key: ?*const char, key_len: usize, value: ?*anyopaque) ?*bst_map_entry;
-extern fn lexbor_bst_map_insert_not_exists(bst_map: ?*bst_map, scope: ?*?*lb.core.bst_entry, key: ?*const char, key_len: usize) ?*bst_map_entry;
-extern fn lexbor_bst_map_remove(bst_map: ?*bst_map, scope: ?*?*lb.core.bst_entry, key: ?*const char, key_len: usize) ?*anyopaque;
-extern fn lexbor_bst_map_mraw_noi(bst_map: ?*bst_map) ?*mraw;
+extern fn lexbor_bst_map_create() ?*bstMap;
+extern fn lexbor_bst_map_init(bst_map: ?*bstMap, size: usize) status;
+extern fn lexbor_bst_map_clean(bst_map: ?*bstMap) void;
+extern fn lexbor_bst_map_destroy(bst_map: ?*bstMap, self_destroy: bool) ?*bstMap;
+extern fn lexbor_bst_map_search(bst_map: ?*bstMap, scope: ?*bstEntry, key: ?*const char, key_len: usize) ?*bstMapEntry;
+extern fn lexbor_bst_map_insert(bst_map: ?*bstMap, scope: ?*?*bstEntry, key: ?*const char, key_len: usize, value: ?*anyopaque) ?*bstMapEntry;
+extern fn lexbor_bst_map_insert_not_exists(bst_map: ?*bstMap, scope: ?*?*bstEntry, key: ?*const char, key_len: usize) ?*bstMapEntry;
+extern fn lexbor_bst_map_remove(bst_map: ?*bstMap, scope: ?*?*bstEntry, key: ?*const char, key_len: usize) ?*anyopaque;
+extern fn lexbor_bst_map_mraw_noi(bst_map: ?*bstMap) ?*mraw;
 
 // core/conv.h
 
-pub fn conv_float_to_data(num: f64, buf: ?*char, len: usize) usize {
+pub fn convFloatToData(num: f64, buf: ?*char, len: usize) usize {
     return lexbor_conv_float_to_data(num, buf, len);
 }
 
-pub fn conv_long_to_data(num: c_long, buf: ?*char, len: usize) usize {
+pub fn convLongToData(num: c_long, buf: ?*char, len: usize) usize {
     return lexbor_conv_long_to_data(num, buf, len);
 }
 
-pub fn conv_int64_to_data(num: i64, buf: ?*char, len: usize) usize {
+pub fn convInt64ToData(num: i64, buf: ?*char, len: usize) usize {
     return lexbor_conv_int64_to_data(num, buf, len);
 }
 
-pub fn conv_data_to_double(start: ?*const ?*char, len: usize) f64 {
+pub fn convDataToDouble(start: ?*const ?*char, len: usize) f64 {
     return lexbor_conv_data_to_double(start, len);
 }
 
-pub fn conv_data_to_ulong(data: ?*const ?*char, length: usize) c_ulong {
+pub fn convDataToUlong(data: ?*const ?*char, length: usize) c_ulong {
     return lexbor_conv_data_to_ulong(data, length);
 }
 
-pub fn conv_data_to_long(data: ?*const ?*char, length: usize) c_long {
+pub fn convDataToLong(data: ?*const ?*char, length: usize) c_long {
     return lexbor_conv_data_to_long(data, length);
 }
 
-pub fn conv_data_to_uint(data: ?*const ?*char, length: usize) c_uint {
+pub fn convDataToUint(data: ?*const ?*char, length: usize) c_uint {
     return lexbor_conv_data_to_uint(data, length);
 }
 
-pub fn conv_dec_to_hex(number: u32, out: ?*char, length: usize) usize {
+pub fn convDecToHex(number: u32, out: ?*char, length: usize) usize {
     return lexbor_conv_dec_to_hex(number, out, length);
 }
 
@@ -495,7 +495,7 @@ extern fn lexbor_conv_data_to_long(data: ?*const ?*char, length: usize) c_long;
 extern fn lexbor_conv_data_to_uint(data: ?*const ?*char, length: usize) c_uint;
 extern fn lexbor_conv_dec_to_hex(number: u32, out: ?*char, length: usize) usize;
 
-pub inline fn conv_double_to_long(number: f64) c_long {
+pub inline fn convDoubleToLong(number: f64) c_long {
     if (number > std.math.maxInt(c_long)) {
         return std.math.maxInt(c_long);
     }
@@ -509,7 +509,7 @@ pub inline fn conv_double_to_long(number: f64) c_long {
 
 // core/diyfp.h
 
-pub inline fn uint64_hl(h: anytype, l: anytype) u64 {
+pub inline fn uint64Hl(h: anytype, l: anytype) u64 {
     return @intCast((h << 32) + l);
 }
 
@@ -519,9 +519,9 @@ pub const DBL_EXPONENT_MIN = -DBL_EXPONENT_BIAS;
 pub const DBL_EXPONENT_MAX = 0x7FF - DBL_EXPONENT_BIAS;
 pub const DBL_EXPONENT_DENORMAL = -DBL_EXPONENT_BIAS + 1;
 
-pub const DBL_SIGNIFICAND_MASK = uint64_hl(0x000FFFFF, 0xFFFFFFFF);
-pub const DBL_HIDDEN_BIT = uint64_hl(0x00100000, 0x00000000);
-pub const DBL_EXPONENT_MASK = uint64_hl(0x7FF00000, 0x00000000);
+pub const DBL_SIGNIFICAND_MASK = uint64Hl(0x000FFFFF, 0xFFFFFFFF);
+pub const DBL_HIDDEN_BIT = uint64Hl(0x00100000, 0x00000000);
+pub const DBL_EXPONENT_MASK = uint64Hl(0x7FF00000, 0x00000000);
 pub const DIYFP_SIGNIFICAND_SIZE = 64;
 pub const SIGNIFICAND_SIZE = 53;
 pub const SIGNIFICAND_SHIFT = DIYFP_SIGNIFICAND_SIZE - DBL_SIGNIFICAND_SIZE;
@@ -535,18 +535,18 @@ pub const diyfp = extern struct {
     exp: c_int,
 };
 
-pub fn cached_power_dec(exp: c_int, dec_exp: ?*c_int) diyfp {
+pub fn cachedPowerDec(exp: c_int, dec_exp: ?*c_int) diyfp {
     return lexbor_cached_power_dec(exp, dec_exp);
 }
 
-pub fn cached_power_bin(exp: c_int, dec_exp: ?*c_int) diyfp {
+pub fn cachedPowerBin(exp: c_int, dec_exp: ?*c_int) diyfp {
     return lexbor_cached_power_bin(exp, dec_exp);
 }
 
 extern fn lexbor_cached_power_dec(exp: c_int, dec_exp: ?*c_int) diyfp;
 extern fn lexbor_cached_power_bin(exp: c_int, dec_exp: ?*c_int) diyfp;
 
-pub inline fn diyfp_leading_zeros64(x: u64) u64 {
+pub inline fn diyfpLeadingZeros64(x: u64) u64 {
     var n: u64 = undefined;
 
     if (x == 0) {
@@ -562,7 +562,7 @@ pub inline fn diyfp_leading_zeros64(x: u64) u64 {
     return n;
 }
 
-pub inline fn diyfp_from_d2(d: u64) diyfp {
+pub inline fn diyfpFromD2(d: u64) diyfp {
     var biased_exp: c_int = undefined;
     var significand: u64 = undefined;
     var r: diyfp = undefined;
@@ -589,7 +589,7 @@ pub inline fn diyfp_from_d2(d: u64) diyfp {
     return r;
 }
 
-pub inline fn diyfp_2d(v: diyfp) f64 {
+pub inline fn diyfp2d(v: diyfp) f64 {
     var exp: c_int = undefined;
     var significand: u64 = undefined;
     var biased_exp: u64 = undefined;
@@ -632,19 +632,19 @@ pub inline fn diyfp_2d(v: diyfp) f64 {
     return u.d;
 }
 
-pub inline fn diyfp_shift_left(v: diyfp, shift: c_uint) diyfp {
+pub inline fn diyfpShiftLeft(v: diyfp, shift: c_uint) diyfp {
     return diyfp{ .significand = v.significand << shift, .exp = v.exp - shift };
 }
 
-pub inline fn diyfp_shift_right(v: diyfp, shift: c_uint) diyfp {
+pub inline fn diyfpShiftRight(v: diyfp, shift: c_uint) diyfp {
     return diyfp{ .significand = v.significand >> shift, .exp = v.exp + shift };
 }
 
-pub inline fn diyfp_sub(lhs: diyfp, rhs: diyfp) diyfp {
+pub inline fn diyfpSub(lhs: diyfp, rhs: diyfp) diyfp {
     return diyfp{ .significand = lhs.significand - rhs.significand, .exp = lhs.exp };
 }
 
-pub inline fn diyfp_mul(lhs: diyfp, rhs: diyfp) diyfp {
+pub inline fn diyfpMul(lhs: diyfp, rhs: diyfp) diyfp {
     const a: u64 = lhs.significand >> 32;
     const b: u64 = lhs.significand & 0xffffffff;
     const c: u64 = rhs.significand >> 32;
@@ -662,15 +662,15 @@ pub inline fn diyfp_mul(lhs: diyfp, rhs: diyfp) diyfp {
     return diyfp{ .significand = ac + (ad >> 32) + (bc >> 32) + (tmp >> 32), .exp = lhs.exp + rhs.exp + 64 };
 }
 
-pub inline fn diyfp_normalize(v: diyfp) diyfp {
-    return diyfp_shift_left(v, diyfp_leading_zeros64(v.significand));
+pub inline fn diyfpNormalize(v: diyfp) diyfp {
+    return diyfpShiftLeft(v, diyfpLeadingZeros64(v.significand));
 }
 
 // core/dobject.h
 
 pub const dobject = extern struct {
     mem: ?*mem,
-    cache: ?*array,
+    cache: ?*Array,
 
     allocated: usize,
     struct_size: usize,

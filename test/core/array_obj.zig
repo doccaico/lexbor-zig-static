@@ -10,7 +10,7 @@ pub const test_struct = struct {
 };
 
 test "init" {
-    var array = lb.core.array_obj.create().?;
+    var array = lb.core.ArrayObj.create().?;
     const status = array.init(32, @sizeOf(test_struct));
 
     try expectEqual(status, @intFromEnum(lb.core.Status.ok));
@@ -19,13 +19,13 @@ test "init" {
 }
 
 test "init_null" {
-    const status = lb.core.array_obj.init(null, 32, @sizeOf(test_struct));
+    const status = lb.core.ArrayObj.init(null, 32, @sizeOf(test_struct));
     try expectEqual(status, @intFromEnum(lb.core.Status.error_object_is_null));
 }
 
 test "init_stack" {
     var status: lb.core.status = undefined;
-    var array: lb.core.array_obj = undefined;
+    var array: lb.core.ArrayObj = undefined;
 
     status = array.init(32, @sizeOf(test_struct));
     try expectEqual(status, @intFromEnum(lb.core.Status.ok));
@@ -34,7 +34,7 @@ test "init_stack" {
 }
 
 test "clean" {
-    var array: lb.core.array_obj = undefined;
+    var array: lb.core.ArrayObj = undefined;
     _ = array.init(32, @sizeOf(test_struct));
 
     _ = array.push();
@@ -47,7 +47,7 @@ test "clean" {
 }
 
 test "push" {
-    var array: lb.core.array_obj = undefined;
+    var array: lb.core.ArrayObj = undefined;
     _ = array.init(32, @sizeOf(test_struct));
 
     try expectEqual(array.length, 0);
@@ -62,7 +62,7 @@ test "push" {
 }
 
 test "pop" {
-    var array: lb.core.array_obj = undefined;
+    var array: lb.core.ArrayObj = undefined;
     _ = array.init(32, @sizeOf(test_struct));
 
     const entry = array.push();
@@ -75,7 +75,7 @@ test "pop" {
 }
 
 test "pop_if_empty" {
-    var array: lb.core.array_obj = undefined;
+    var array: lb.core.ArrayObj = undefined;
     _ = array.init(32, @sizeOf(test_struct));
 
     try expectEqual(array.length, 0);
@@ -86,7 +86,7 @@ test "pop_if_empty" {
 }
 
 test "get" {
-    var array: lb.core.array_obj = undefined;
+    var array: lb.core.ArrayObj = undefined;
     _ = array.init(32, @sizeOf(test_struct));
 
     try expectEqual(array.get(1), null);
@@ -104,7 +104,7 @@ test "get" {
 
 test "delete" {
     var entry: *test_struct = undefined;
-    var array: lb.core.array_obj = undefined;
+    var array: lb.core.ArrayObj = undefined;
 
     _ = array.init(32, @sizeOf(test_struct));
 
@@ -198,7 +198,7 @@ test "delete" {
 }
 
 test "delete_if_empty" {
-    var array: lb.core.array_obj = undefined;
+    var array: lb.core.ArrayObj = undefined;
     _ = array.init(32, @sizeOf(test_struct));
 
     array.delete(0, 0);
@@ -220,7 +220,7 @@ test "delete_if_empty" {
 }
 
 test "expand" {
-    var array: lb.core.array_obj = undefined;
+    var array: lb.core.ArrayObj = undefined;
     _ = array.init(32, @sizeOf(test_struct));
 
     try expect(array.expand(128) != null);
@@ -230,30 +230,30 @@ test "expand" {
 }
 
 test "destroy" {
-    var array = lb.core.array_obj.create().?;
+    var array = lb.core.ArrayObj.create().?;
     _ = array.init(32, @sizeOf(test_struct));
 
     try expectEqual(array.destroy(true), null);
 
-    array = lb.core.array_obj.create().?;
+    array = lb.core.ArrayObj.create().?;
     _ = array.init(32, @sizeOf(test_struct));
 
     try expectEqual(array.destroy(false), array);
     try expectEqual(array.destroy(true), null);
-    try expectEqual(lb.core.array_obj.destroy(null, false), null);
+    try expectEqual(lb.core.ArrayObj.destroy(null, false), null);
 }
 
 test "destroy_stack" {
-    var array: lb.core.array_obj = undefined;
+    var array: lb.core.ArrayObj = undefined;
     _ = array.init(32, @sizeOf(test_struct));
 
-    try expectEqual(lb.core.array_obj.destroy(&array, false), &array);
+    try expectEqual(lb.core.ArrayObj.destroy(&array, false), &array);
 }
 
 // adding my test cases
 
 test "erase" {
-    var array: lb.core.array_obj = undefined;
+    var array: lb.core.ArrayObj = undefined;
     _ = array.init(32, @sizeOf(test_struct));
 
     const e0 = array.push();

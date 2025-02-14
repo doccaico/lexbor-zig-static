@@ -6,7 +6,7 @@ const expectEqualStrings = std.testing.expectEqualStrings;
 const lb = @import("lexbor");
 
 test "init" {
-    var bst_map = lb.core.bst_map.create().?;
+    var bst_map = lb.core.bstMap.create().?;
     const status = bst_map.init(128);
 
     try expectEqual(status, @intFromEnum(lb.core.Status.ok));
@@ -15,12 +15,12 @@ test "init" {
 }
 
 test "init_null" {
-    const status = lb.core.bst_map.init(null, 128);
+    const status = lb.core.bstMap.init(null, 128);
     try expectEqual(status, @intFromEnum(lb.core.Status.error_object_is_null));
 }
 
 test "init_stack" {
-    var bst_map: lb.core.bst_map = undefined;
+    var bst_map: lb.core.bstMap = undefined;
     const status = bst_map.init(128);
 
     try expectEqual(status, @intFromEnum(lb.core.Status.ok));
@@ -29,7 +29,7 @@ test "init_stack" {
 }
 
 test "init_args" {
-    var bst_map: lb.core.bst_map = .{ .bst = null, .mraw = null, .entries = null };
+    var bst_map: lb.core.bstMap = .{ .bst = null, .mraw = null, .entries = null };
     var status: lb.core.status = undefined;
 
     status = bst_map.init(0);
@@ -39,10 +39,10 @@ test "init_args" {
 }
 
 test "bst_map_insert" {
-    var bst_map: lb.core.bst_map = undefined;
-    var entry: ?*lb.core.bst_map_entry = undefined;
+    var bst_map: lb.core.bstMap = undefined;
+    var entry: ?*lb.core.bstMapEntry = undefined;
 
-    var scope: ?*lb.core.bst_entry = null;
+    var scope: ?*lb.core.bstEntry = null;
 
     const key = "test";
     const key_len = key.len;
@@ -62,10 +62,10 @@ test "bst_map_insert" {
 }
 
 test "bst_map_search" {
-    var bst_map: lb.core.bst_map = undefined;
-    var entry: ?*lb.core.bst_map_entry = undefined;
+    var bst_map: lb.core.bstMap = undefined;
+    var entry: ?*lb.core.bstMapEntry = undefined;
 
-    var scope: ?*lb.core.bst_entry = null;
+    var scope: ?*lb.core.bstEntry = null;
 
     const key = "test";
     const key_len = key.len;
@@ -95,10 +95,10 @@ test "bst_map_search" {
 
 test "bst_map_remove" {
     var value: ?*anyopaque = undefined;
-    var bst_map: lb.core.bst_map = undefined;
-    var entry: ?*lb.core.bst_map_entry = undefined;
+    var bst_map: lb.core.bstMap = undefined;
+    var entry: ?*lb.core.bstMapEntry = undefined;
 
-    var scope: ?*lb.core.bst_entry = null;
+    var scope: ?*lb.core.bstEntry = null;
 
     const key = "test";
     const key_len = key.len;
@@ -125,9 +125,9 @@ test "bst_map_remove" {
 }
 
 test "clean" {
-    var bst_map: lb.core.bst_map = undefined;
-    var entry: ?*lb.core.bst_map_entry = undefined;
-    var scope: ?*lb.core.bst_entry = null;
+    var bst_map: lb.core.bstMap = undefined;
+    var entry: ?*lb.core.bstMapEntry = undefined;
+    var scope: ?*lb.core.bstEntry = null;
 
     const key = "test";
     const key_len = key.len;
@@ -144,21 +144,21 @@ test "clean" {
 }
 
 test "destroy" {
-    var bst_map = lb.core.bst_map.create().?;
+    var bst_map = lb.core.bstMap.create().?;
     try expectEqual(bst_map.init(128), @intFromEnum(lb.core.Status.ok));
 
     try expectEqual(bst_map.destroy(true), null);
 
-    bst_map = lb.core.bst_map.create().?;
+    bst_map = lb.core.bstMap.create().?;
     try expectEqual(bst_map.init(128), @intFromEnum(lb.core.Status.ok));
 
     try expectEqual(bst_map.destroy(false), bst_map);
     try expectEqual(bst_map.destroy(true), null);
-    try expectEqual(lb.core.bst_map.destroy(null, false), null);
+    try expectEqual(lb.core.bstMap.destroy(null, false), null);
 }
 
 test "destroy_stack" {
-    var bst_map: lb.core.bst_map = undefined;
+    var bst_map: lb.core.bstMap = undefined;
     try expectEqual(bst_map.init(128), @intFromEnum(lb.core.Status.ok));
 
     try expectEqual(bst_map.destroy(false), &bst_map);

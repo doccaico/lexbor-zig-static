@@ -5,8 +5,8 @@ const expectEqual = std.testing.expectEqual;
 const lb = @import("lexbor");
 
 fn test_for_push(bst: *lb.core.bst) !void {
-    var entry: *lb.core.bst_entry = undefined;
-    var pushed: ?*lb.core.bst_entry = undefined;
+    var entry: *lb.core.bstEntry = undefined;
+    var pushed: ?*lb.core.bstEntry = undefined;
 
     try expect(bst.insert(&bst.root, 5, @as(*anyopaque, @ptrFromInt(5))) != null);
     try expect(bst.insert(&bst.root, 2, @as(*anyopaque, @ptrFromInt(2))) != null);
@@ -56,7 +56,7 @@ test "init_args" {
 
 test "bst_insert" {
     var bst: lb.core.bst = undefined;
-    var entry: *lb.core.bst_entry = undefined;
+    var entry: *lb.core.bstEntry = undefined;
 
     try expectEqual(bst.init(128), @intFromEnum(lb.core.Status.ok));
 
@@ -77,7 +77,7 @@ test "bst_insert" {
 
 test "bst_search" {
     var bst: lb.core.bst = undefined;
-    var entry: ?*lb.core.bst_entry = undefined;
+    var entry: ?*lb.core.bstEntry = undefined;
 
     try expectEqual(bst.init(128), @intFromEnum(lb.core.Status.ok));
 
@@ -92,7 +92,7 @@ test "bst_search" {
 
 test "bst_search_close" {
     var bst: lb.core.bst = undefined;
-    var entry: ?*lb.core.bst_entry = undefined;
+    var entry: ?*lb.core.bstEntry = undefined;
 
     try expectEqual(bst.init(128), @intFromEnum(lb.core.Status.ok));
 
@@ -114,7 +114,7 @@ test "bst_search_close" {
 
 test "bst_search_close_more" {
     var bst: lb.core.bst = undefined;
-    var entry: ?*lb.core.bst_entry = undefined;
+    var entry: ?*lb.core.bstEntry = undefined;
 
     try expectEqual(bst.init(128), @intFromEnum(lb.core.Status.ok));
 
@@ -306,12 +306,12 @@ test "clean" {
 }
 
 test "destroy" {
-    var bst = lb.core.array.create().?;
+    var bst = lb.core.Array.create().?;
     try expectEqual(bst.init(128), @intFromEnum(lb.core.Status.ok));
 
     try expectEqual(bst.destroy(true), null);
 
-    bst = lb.core.array.create().?;
+    bst = lb.core.Array.create().?;
     try expectEqual(bst.init(128), @intFromEnum(lb.core.Status.ok));
 
     try expectEqual(bst.destroy(false), bst);

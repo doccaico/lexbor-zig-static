@@ -5,7 +5,7 @@ const expectEqual = std.testing.expectEqual;
 const lb = @import("lexbor");
 
 test "init" {
-    var array = lb.core.array.create().?;
+    var array = lb.core.Array.create().?;
     const status = array.init(32);
 
     try expectEqual(status, @intFromEnum(lb.core.Status.ok));
@@ -14,12 +14,12 @@ test "init" {
 }
 
 test "init_null" {
-    const status = lb.core.array.init(null, 32);
+    const status = lb.core.Array.init(null, 32);
     try expectEqual(status, @intFromEnum(lb.core.Status.error_object_is_null));
 }
 
 test "init_stack" {
-    var array: lb.core.array = undefined;
+    var array: lb.core.Array = undefined;
     const status = array.init(32);
 
     try expectEqual(status, @intFromEnum(lb.core.Status.ok));
@@ -28,7 +28,7 @@ test "init_stack" {
 }
 
 test "clean" {
-    var array: lb.core.array = undefined;
+    var array: lb.core.Array = undefined;
     _ = array.init(32);
 
     _ = array.push(@as(*anyopaque, @ptrFromInt(1)));
@@ -41,7 +41,7 @@ test "clean" {
 }
 
 test "push" {
-    var array: lb.core.array = undefined;
+    var array: lb.core.Array = undefined;
     _ = array.init(32);
 
     try expectEqual(array.length, 0);
@@ -55,7 +55,7 @@ test "push" {
 }
 
 test "push_null" {
-    var array: lb.core.array = undefined;
+    var array: lb.core.Array = undefined;
     _ = array.init(32);
 
     _ = array.push(null);
@@ -67,7 +67,7 @@ test "push_null" {
 }
 
 test "pop" {
-    var array: lb.core.array = undefined;
+    var array: lb.core.Array = undefined;
     _ = array.init(32);
 
     _ = array.push(@as(*anyopaque, @ptrFromInt(123)));
@@ -79,7 +79,7 @@ test "pop" {
 }
 
 test "pop_if_empty" {
-    var array: lb.core.array = undefined;
+    var array: lb.core.Array = undefined;
     _ = array.init(32);
 
     try expectEqual(array.length, 0);
@@ -90,7 +90,7 @@ test "pop_if_empty" {
 }
 
 test "get" {
-    var array: lb.core.array = undefined;
+    var array: lb.core.Array = undefined;
     _ = array.init(32);
 
     try expectEqual(array.get(1), null);
@@ -106,7 +106,7 @@ test "get" {
 }
 
 test "set" {
-    var array: lb.core.array = undefined;
+    var array: lb.core.Array = undefined;
     _ = array.init(32);
 
     _ = array.push(@as(*anyopaque, @ptrFromInt(123)));
@@ -120,7 +120,7 @@ test "set" {
 }
 
 test "set_not_exists" {
-    var array: lb.core.array = undefined;
+    var array: lb.core.Array = undefined;
     _ = array.init(32);
 
     try expectEqual(array.set(10, @as(*anyopaque, @ptrFromInt(123))), @intFromEnum(lb.core.Status.ok));
@@ -137,7 +137,7 @@ test "set_not_exists" {
 
 test "insert" {
     var status: lb.core.status = undefined;
-    var array: lb.core.array = undefined;
+    var array: lb.core.Array = undefined;
     _ = array.init(32);
 
     status = array.insert(0, @as(*anyopaque, @ptrFromInt(456)));
@@ -153,7 +153,7 @@ test "insert" {
 
 test "insert_end" {
     var status: lb.core.status = undefined;
-    var array: lb.core.array = undefined;
+    var array: lb.core.Array = undefined;
     _ = array.init(32);
 
     status = array.insert(32, @as(*anyopaque, @ptrFromInt(457)));
@@ -169,7 +169,7 @@ test "insert_end" {
 
 test "insert_overflow" {
     var status: lb.core.status = undefined;
-    var array: lb.core.array = undefined;
+    var array: lb.core.Array = undefined;
     _ = array.init(32);
 
     status = array.insert(33, @as(*anyopaque, @ptrFromInt(458)));
@@ -185,7 +185,7 @@ test "insert_overflow" {
 
 test "insert_to" {
     var status: lb.core.status = undefined;
-    var array: lb.core.array = undefined;
+    var array: lb.core.Array = undefined;
     _ = array.init(32);
 
     try expectEqual(array.push(@as(*anyopaque, @ptrFromInt(1))), @intFromEnum(lb.core.Status.ok));
@@ -219,7 +219,7 @@ test "insert_to" {
 
 test "insert_to_end" {
     var status: lb.core.status = undefined;
-    var array: lb.core.array = undefined;
+    var array: lb.core.Array = undefined;
     _ = array.init(9);
 
     try expectEqual(array.push(@as(*anyopaque, @ptrFromInt(1))), @intFromEnum(lb.core.Status.ok));
@@ -256,7 +256,7 @@ test "insert_to_end" {
 }
 
 test "delete" {
-    var array: lb.core.array = undefined;
+    var array: lb.core.Array = undefined;
     _ = array.init(32);
 
     for (0..10) |i| {
@@ -312,7 +312,7 @@ test "delete" {
 }
 
 test "delete_if_empty" {
-    var array: lb.core.array = undefined;
+    var array: lb.core.Array = undefined;
     _ = array.init(32);
 
     array.delete(0, 0);
@@ -334,7 +334,7 @@ test "delete_if_empty" {
 }
 
 test "expand" {
-    var array: lb.core.array = undefined;
+    var array: lb.core.Array = undefined;
     _ = array.init(32);
 
     try expect(array.expand(128) != null);
@@ -344,21 +344,21 @@ test "expand" {
 }
 
 test "destroy" {
-    var array = lb.core.array.create().?;
+    var array = lb.core.Array.create().?;
     _ = array.init(32);
 
     try expectEqual(array.destroy(true), null);
 
-    array = lb.core.array.create().?;
+    array = lb.core.Array.create().?;
     _ = array.init(32);
 
     try expectEqual(array.destroy(false), array);
     try expectEqual(array.destroy(true), null);
-    try expectEqual(lb.core.array.destroy(null, false), null);
+    try expectEqual(lb.core.Array.destroy(null, false), null);
 }
 
 test "destroy_stack" {
-    var array: lb.core.array = undefined;
+    var array: lb.core.Array = undefined;
     _ = array.init(32);
 
     try expectEqual(array.destroy(false), &array);
