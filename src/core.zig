@@ -589,7 +589,7 @@ pub inline fn diyfp_from_d2(d: u64) diyfp {
     return r;
 }
 
-pub inline fn diyfp_from_22(v: diyfp) f64 {
+pub inline fn diyfp_2d(v: diyfp) f64 {
     var exp: c_int = undefined;
     var significand: u64 = undefined;
     var biased_exp: u64 = undefined;
