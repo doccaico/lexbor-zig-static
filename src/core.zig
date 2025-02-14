@@ -293,11 +293,11 @@ pub const Action = enum(c_int) {
     next = 0x02,
 };
 
-pub const cbF = ?*const fn (data: ?*char, len: usize, ctx: ?*anyopaque) callconv(.C) status;
-pub const cbCpF = ?*const fn (cps: ?*codepoint, len: usize, ctx: ?*anyopaque) callconv(.C) status;
+pub const serializeCbF = ?*const fn (data: ?*const char, len: usize, ctx: ?*anyopaque) callconv(.C) status;
+pub const serializeCbCpF = ?*const fn (cps: ?*const codepoint, len: usize, ctx: ?*anyopaque) callconv(.C) status;
 
 pub const SerializeCtx = extern struct {
-    c: cbF,
+    c: serializeCbF,
     ctx: ?*anyopaque,
 
     opt: isize,
@@ -675,7 +675,6 @@ extern fn lexbor_cached_power_bin(exp: c_int, dec_exp: ?*c_int) diyfp;
 pub const Dobject = extern struct {
     mem: ?*mem,
     cache: ?*Array,
-
     allocated: usize,
     struct_size: usize,
 
@@ -762,31 +761,31 @@ pub const fsFileType = enum(c_int) {
     socket = 0x07,
 };
 
-pub fn fsDirRead(dirpath: ?*char, opt: c_int, callback: fsDirFileF, ctx: ?*anyopaque) status {
+pub fn fsDirRead(dirpath: ?*const char, opt: c_int, callback: fsDirFileF, ctx: ?*anyopaque) status {
     return lexbor_fs_dir_read(dirpath, opt, callback, ctx);
 }
 
 // Name change: I wanted to use "fsFileType", but it was already taken so I added "get" to the name.
-pub fn fsGetFileType(full_path: ?*char) fsFileType {
+pub fn fsGetFileType(full_path: ?*const char) fsFileType {
     return lexbor_fs_file_type(full_path);
 }
 
-pub fn fsFileEasyRead(full_path: ?*char, len: ?*usize) ?*char {
+pub fn fsFileEasyRead(full_path: ?*const char, len: ?*usize) ?*char {
     return lexbor_fs_file_easy_read(full_path, len);
 }
 
-extern fn lexbor_fs_dir_read(dirpath: ?*char, opt: c_int, callback: fsDirFileF, ctx: ?*anyopaque) status;
-extern fn lexbor_fs_file_type(full_path: ?*char) fsFileType;
-extern fn lexbor_fs_file_easy_read(full_path: ?*char, len: ?*usize) ?*char;
+extern fn lexbor_fs_dir_read(dirpath: ?*const char, opt: c_int, callback: fsDirFileF, ctx: ?*anyopaque) status;
+extern fn lexbor_fs_file_type(full_path: ?*const char) fsFileType;
+extern fn lexbor_fs_file_easy_read(full_path: ?*const char, len: ?*usize) ?*char;
 
 // core/hash.h
 
 pub const HASH_SHORT_SIZE = 16;
 pub const HASH_TABLE_MIN_SIZE = 32;
 
-pub const hashIdF = ?*const fn (key: ?*char, len: usize) callconv(.C) u32;
-pub const hashCopyF = ?*const fn (hash: ?*Hash, entry: ?*HashEntry, key: ?*char, len: usize) callconv(.C) status;
-pub const hashCmpF = ?*const fn (first: ?*char, second: ?*char, size: usize) callconv(.C) bool;
+pub const hashIdF = ?*const fn (key: ?*const char, len: usize) callconv(.C) u32;
+pub const hashCopyF = ?*const fn (hash: ?*Hash, entry: ?*HashEntry, key: ?*const char, len: usize) callconv(.C) status;
+pub const hashCmpF = ?*const fn (first: ?*const char, second: ?*const char, size: usize) callconv(.C) bool;
 
 pub const HashEntry = extern struct {
     u: extern union {
@@ -797,16 +796,6 @@ pub const HashEntry = extern struct {
     length: usize,
 
     next: ?*HashEntry,
-};
-
-pub const Hash = extern struct {
-    entries: ?*Dobject,
-    mraw: ?*mraw,
-
-    table: ?*?*HashEntry,
-    table_size: usize,
-
-    struct_size: usize,
 };
 
 pub const HashInsert = extern struct {
@@ -820,13 +809,69 @@ pub const HashSearch = extern struct {
     cmp: hashCmpF,
 };
 
+pub const Hash = extern struct {
+    entries: ?*Dobject,
+    mraw: ?*mraw,
+    table: ?*?*HashEntry,
+    table_size: usize,
+    struct_size: usize,
+
+    pub fn create() ?*Hash {
+        return lexbor_hash_create();
+    }
+
+    pub fn init(self: ?*Hash, table_size: usize, struct_size: usize) status {
+        return lexbor_hash_init(self, table_size, struct_size);
+    }
+
+    pub fn clean(self: ?*Hash) void {
+        lexbor_hash_clean(self);
+    }
+
+    pub fn destroy(self: ?*Hash, destroy_obj: bool) ?*Hash {
+        return lexbor_hash_destroy(self, destroy_obj);
+    }
+
+    pub fn insert(self: ?*Hash, insert_: ?*const HashInsert, key: ?*const char, length: usize) ?*anyopaque {
+        return lexbor_hash_insert(self, insert_, key, length);
+    }
+
+    pub fn insertByEntry(self: ?*Hash, entry: ?*HashEntry, search_: ?*const HashSearch, key: ?*const char, length: usize) ?*anyopaque {
+        return lexbor_hash_insert_by_entry(self, entry, search_, key, length);
+    }
+
+    pub fn remove(self: ?*Hash, search_: ?*const HashSearch, key: ?*const char, length: usize) void {
+        lexbor_hash_remove(self, search_, key, length);
+    }
+
+    pub fn search(self: ?*Hash, search_: ?*const HashSearch, key: ?*const char, length: usize) ?*anyopaque {
+        return lexbor_hash_search(self, search_, key, length);
+    }
+};
+
+extern fn lexbor_hash_create() ?*Hash;
+extern fn lexbor_hash_init(hash: ?*Hash, table_size: usize, struct_size: usize) status;
+extern fn lexbor_hash_clean(hash: ?*Hash) void;
+extern fn lexbor_hash_destroy(hash: ?*Hash, destroy_obj: bool) ?*Hash;
+extern fn lexbor_hash_insert(hash: ?*Hash, insert: ?*const HashInsert, key: ?*const char, length: usize) ?*anyopaque;
+extern fn lexbor_hash_insert_by_entry(hash: ?*Hash, entry: ?*HashEntry, search: ?*const HashSearch, key: ?*const char, length: usize) ?*anyopaque;
+extern fn lexbor_hash_remove(hash: ?*Hash, search: ?*const HashSearch, key: ?*const char, length: usize) void;
+extern fn lexbor_hash_search(hash: ?*Hash, search: ?*const HashSearch, key: ?*const char, length: usize) ?*anyopaque;
+extern fn lexbor_hash_remove_by_hash_id(hash: ?*Hash, hash_id: u32, key: ?*const char, length: usize, cmp_func: hashCmpF) void;
+extern fn lexbor_hash_search_by_hash_id(hash: ?*Hash, hash_id: u32, key: ?*const char, length: usize, cmp_func: hashCmpF) ?*anyopaque;
+extern fn lexbor_hash_make_id(key: ?*const char, length: usize) u32;
+extern fn lexbor_hash_make_id_lower(key: ?*const char, length: usize) u32;
+extern fn lexbor_hash_make_id_upper(key: ?*const char, length: usize) u32;
+extern fn lexbor_hash_copy(hash: ?*Hash, entry: ?*HashEntry, key: ?*const char, length: usize) status;
+extern fn lexbor_hash_lower(hash: ?*Hash, entry: ?*HashEntry, key: ?*const char, length: usize) status;
+extern fn lexbor_hash_upper(hash: ?*Hash, entry: ?*HashEntry, key: ?*const char, length: usize) status;
+
 // core/mem.h
 
 pub const memChunk = extern struct {
     data: ?*u8,
     length: usize,
     size: usize,
-
     next: ?*memChunk,
     prev: ?*memChunk,
 };
@@ -834,7 +879,6 @@ pub const memChunk = extern struct {
 pub const mem = extern struct {
     chunk: ?*memChunk,
     chunk_first: ?*memChunk,
-
     chunk_min_size: usize,
     chunk_length: usize,
 };
