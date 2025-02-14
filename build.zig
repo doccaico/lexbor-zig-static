@@ -58,7 +58,6 @@ pub fn build(b: *Build) !void {
         .root_source_file = b.path("test/tests.zig"),
         .target = target,
         .optimize = optimize,
-        .link_libc = true,
     });
 
     parseOptions(&options);
