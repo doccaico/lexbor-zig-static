@@ -257,11 +257,12 @@ extern fn lexbor_avl_foreach_recursion(avl: ?*avl, scope: ?*avlNode, callback: a
 
 // core/base.h
 
-const version_major = 1;
-const version_minor = 8;
-const version_patch = 0;
-
-const version_string = "1.8.0";
+pub const version = struct {
+    pub const major = 1;
+    pub const minor = 8;
+    pub const patch = 0;
+    pub const string = "1.8.0";
+};
 
 pub const Status = enum(c_int) {
     ok = 0x0000,
@@ -293,17 +294,15 @@ pub const Action = enum(c_int) {
     next = 0x02,
 };
 
-pub const Serialize = struct {
-    pub const cbF = ?*const fn (data: ?*char, len: usize, ctx: ?*anyopaque) callconv(.C) status;
-    pub const cbCpF = ?*const fn (cps: ?*codepoint, len: usize, ctx: ?*anyopaque) callconv(.C) status;
+pub const cbF = ?*const fn (data: ?*char, len: usize, ctx: ?*anyopaque) callconv(.C) status;
+pub const cbCpF = ?*const fn (cps: ?*codepoint, len: usize, ctx: ?*anyopaque) callconv(.C) status;
 
-    pub const ctx = extern struct {
-        c: cbF,
-        ctx: ?*anyopaque,
+pub const SerializeCtx = extern struct {
+    c: cbF,
+    ctx: ?*anyopaque,
 
-        opt: isize,
-        count: usize,
-    };
+    opt: isize,
+    count: usize,
 };
 
 // core/bst.h
@@ -659,13 +658,15 @@ pub const diyfp = extern struct {
     }
 };
 
-pub fn cachedPowerDec(exp: c_int, dec_exp: ?*c_int) diyfp {
-    return lexbor_cached_power_dec(exp, dec_exp);
-}
+pub const cachedPower = extern struct {
+    pub fn dec(exp: c_int, dec_exp: ?*c_int) diyfp {
+        return lexbor_cached_power_dec(exp, dec_exp);
+    }
 
-pub fn cachedPowerBin(exp: c_int, dec_exp: ?*c_int) diyfp {
-    return lexbor_cached_power_bin(exp, dec_exp);
-}
+    pub fn bin(exp: c_int, dec_exp: ?*c_int) diyfp {
+        return lexbor_cached_power_bin(exp, dec_exp);
+    }
+};
 
 extern fn lexbor_cached_power_dec(exp: c_int, dec_exp: ?*c_int) diyfp;
 extern fn lexbor_cached_power_bin(exp: c_int, dec_exp: ?*c_int) diyfp;

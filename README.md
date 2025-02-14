@@ -27,7 +27,7 @@ const std = @import("std");
 const lb = @import("lexbor");
 
 pub fn main() !void {
-    var array = lb.core.array.create().?;
+    var array = lb.core.Array.create().?;
     const status = array.init(32);
 
     try std.testing.expectEqual(status, @intFromEnum(lb.core.Status.ok));
