@@ -711,12 +711,12 @@ pub const dobject = extern struct {
         return lexbor_dobject_free(self, data);
     }
 
-    pub fn ByAbsolutePosition(self: ?*dobject, pos: usize) ?*anyopaque {
+    pub fn byAbsolutePosition(self: ?*dobject, pos: usize) ?*anyopaque {
         return lexbor_dobject_by_absolute_position(self, pos);
     }
 
     pub fn cacheLength(self: ?*dobject) usize {
-        return self.?.cache.length;
+        return self.?.cache.?.length;
     }
 };
 

@@ -2,6 +2,7 @@ const std = @import("std");
 const expect = std.testing.expect;
 const expectEqual = std.testing.expectEqual;
 const expectEqualStrings = std.testing.expectEqualStrings;
+const zeroInit = std.mem.zeroInit;
 
 const lb = @import("lexbor");
 
@@ -29,7 +30,7 @@ test "init_stack" {
 }
 
 test "init_args" {
-    var bst_map: lb.core.bstMap = .{ .bst = null, .mraw = null, .entries = null };
+    var bst_map = zeroInit(lb.core.bstMap, .{});
     var status: lb.core.status = undefined;
 
     status = bst_map.init(0);

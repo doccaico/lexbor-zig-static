@@ -1,4 +1,4 @@
-// test/unit_tests.zig
+// test/tests.zig
 
 test {
     _ = @import("core/array.zig");

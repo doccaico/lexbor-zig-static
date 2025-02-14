@@ -1,6 +1,7 @@
 const std = @import("std");
 const expect = std.testing.expect;
 const expectEqual = std.testing.expectEqual;
+const zeroInit = std.mem.zeroInit;
 
 const lb = @import("lexbor");
 
@@ -50,7 +51,7 @@ test "init_stack" {
 }
 
 test "init_args" {
-    var avl = lb.core.avl{ .nodes = null, .last_right = null };
+    var avl = zeroInit(lb.core.avl, .{});
     const status = avl.init(0, 0);
 
     try expectEqual(status, @intFromEnum(lb.core.Status.error_wrong_args));

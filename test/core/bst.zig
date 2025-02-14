@@ -1,6 +1,7 @@
 const std = @import("std");
 const expect = std.testing.expect;
 const expectEqual = std.testing.expectEqual;
+const zeroInit = std.mem.zeroInit;
 
 const lb = @import("lexbor");
 
@@ -45,7 +46,7 @@ test "init_stack" {
 }
 
 test "init_args" {
-    var bst: lb.core.bst = .{ .dobject = null, .root = null, .tree_length = 0 };
+    var bst = zeroInit(lb.core.bst, .{});
     var status: lb.core.status = undefined;
 
     status = bst.init(0);
