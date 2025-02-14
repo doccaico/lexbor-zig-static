@@ -505,6 +505,167 @@ pub inline fn conv_double_to_long(number: f64) c_long {
     return @trunc(number);
 }
 
+// core/def.h
+
+// core/diyfp.h
+
+pub inline fn uint64_hl(h: anytype, l: anytype) u64 {
+    return @intCast((h << 32) + l);
+}
+
+pub const DBL_SIGNIFICAND_SIZE = 52;
+pub const DBL_EXPONENT_BIAS = 0x3FF + DBL_SIGNIFICAND_SIZE;
+pub const DBL_EXPONENT_MIN = -DBL_EXPONENT_BIAS;
+pub const DBL_EXPONENT_MAX = 0x7FF - DBL_EXPONENT_BIAS;
+pub const DBL_EXPONENT_DENORMAL = -DBL_EXPONENT_BIAS + 1;
+
+pub const DBL_SIGNIFICAND_MASK = uint64_hl(0x000FFFFF, 0xFFFFFFFF);
+pub const DBL_HIDDEN_BIT = uint64_hl(0x00100000, 0x00000000);
+pub const DBL_EXPONENT_MASK = uint64_hl(0x7FF00000, 0x00000000);
+pub const DIYFP_SIGNIFICAND_SIZE = 64;
+pub const SIGNIFICAND_SIZE = 53;
+pub const SIGNIFICAND_SHIFT = DIYFP_SIGNIFICAND_SIZE - DBL_SIGNIFICAND_SIZE;
+pub const DECIMAL_EXPONENT_OFF = 348;
+pub const DECIMAL_EXPONENT_MIN = -348;
+pub const DECIMAL_EXPONENT_MAX = 340;
+pub const DECIMAL_EXPONENT_DIST = 8;
+
+pub const diyfp = extern struct {
+    significand: u64,
+    exp: c_int,
+};
+
+pub fn cached_power_dec(exp: c_int, dec_exp: ?*c_int) diyfp {
+    return lexbor_cached_power_dec(exp, dec_exp);
+}
+
+pub fn cached_power_bin(exp: c_int, dec_exp: ?*c_int) diyfp {
+    return lexbor_cached_power_bin(exp, dec_exp);
+}
+
+extern fn lexbor_cached_power_dec(exp: c_int, dec_exp: ?*c_int) diyfp;
+extern fn lexbor_cached_power_bin(exp: c_int, dec_exp: ?*c_int) diyfp;
+
+pub inline fn diyfp_leading_zeros64(x: u64) u64 {
+    var n: u64 = undefined;
+
+    if (x == 0) {
+        return 64;
+    }
+
+    n = 0;
+
+    while ((x & 0x8000000000000000) == 0) {
+        n += 1;
+        x <<= 1;
+    }
+    return n;
+}
+
+pub inline fn diyfp_from_d2(d: u64) diyfp {
+    var biased_exp: c_int = undefined;
+    var significand: u64 = undefined;
+    var r: diyfp = undefined;
+
+    const U = extern union {
+        d: f64,
+        u64_: u64,
+    };
+    var u = U{};
+
+    u.d = d;
+
+    biased_exp = (u.u64_ & DBL_EXPONENT_MASK) >> DBL_SIGNIFICAND_SIZE;
+    significand = u.u64_ & DBL_SIGNIFICAND_MASK;
+
+    if (biased_exp != 0) {
+        r.significand = significand + DBL_HIDDEN_BIT;
+        r.exp = biased_exp - DBL_EXPONENT_BIAS;
+    } else {
+        r.significand = significand;
+        r.exp = DBL_EXPONENT_MIN + 1;
+    }
+
+    return r;
+}
+
+pub inline fn diyfp_from_22(v: diyfp) f64 {
+    var exp: c_int = undefined;
+    var significand: u64 = undefined;
+    var biased_exp: u64 = undefined;
+
+    const U = extern union {
+        d: f64,
+        u64_: u64,
+    };
+    var u = U{};
+
+    exp = v.exp;
+    significand = v.significand;
+
+    while (significand > DBL_HIDDEN_BIT + DBL_SIGNIFICAND_MASK) {
+        significand >>= 1;
+        exp += 1;
+    }
+
+    if (exp >= DBL_EXPONENT_MAX) {
+        return std.math.inf(f64);
+    }
+
+    if (exp < DBL_EXPONENT_DENORMAL) {
+        return 0.0;
+    }
+
+    while (exp > DBL_EXPONENT_DENORMAL and (significand & DBL_HIDDEN_BIT) == 0) {
+        significand <<= 1;
+        exp -= 1;
+    }
+
+    if (exp == DBL_EXPONENT_DENORMAL and (significand & DBL_HIDDEN_BIT) == 0) {
+        biased_exp = 0;
+    } else {
+        biased_exp = @intCast(exp + DBL_EXPONENT_BIAS);
+    }
+
+    u.u64_ = (significand & DBL_SIGNIFICAND_MASK) | (biased_exp << DBL_SIGNIFICAND_SIZE);
+
+    return u.d;
+}
+
+pub inline fn diyfp_shift_left(v: diyfp, shift: c_uint) diyfp {
+    return diyfp{ .significand = v.significand << shift, .exp = v.exp - shift };
+}
+
+pub inline fn diyfp_shift_right(v: diyfp, shift: c_uint) diyfp {
+    return diyfp{ .significand = v.significand >> shift, .exp = v.exp + shift };
+}
+
+pub inline fn diyfp_sub(lhs: diyfp, rhs: diyfp) diyfp {
+    return diyfp{ .significand = lhs.significand - rhs.significand, .exp = lhs.exp };
+}
+
+pub inline fn diyfp_mul(lhs: diyfp, rhs: diyfp) diyfp {
+    const a: u64 = lhs.significand >> 32;
+    const b: u64 = lhs.significand & 0xffffffff;
+    const c: u64 = rhs.significand >> 32;
+    const d: u64 = rhs.significand & 0xffffffff;
+
+    const ac: u64 = a * c;
+    const bc: u64 = b * c;
+    const ad: u64 = a * d;
+    const bd: u64 = b * d;
+
+    var tmp: u64 = (bd >> 32) + (ad & 0xffffffff) + (bc & 0xffffffff);
+
+    tmp += @as(c_uint, 1) << 31;
+
+    return diyfp{ .significand = ac + (ad >> 32) + (bc >> 32) + (tmp >> 32), .exp = lhs.exp + rhs.exp + 64 };
+}
+
+pub inline fn diyfp_normalize(v: diyfp) diyfp {
+    return diyfp_shift_left(v, diyfp_leading_zeros64(v.significand));
+}
+
 // core/dobject.h
 
 pub const dobject = extern struct {
