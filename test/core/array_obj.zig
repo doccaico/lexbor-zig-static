@@ -56,7 +56,7 @@ test "push" {
     try expect(entry != null);
 
     try expectEqual(array.length, 1);
-    try expectEqual(array.get(0), entry);
+    try expectEqual(lb.core.arrayObjGet(&array, 0), entry);
 
     _ = array.destroy(false);
 }
@@ -89,15 +89,15 @@ test "get" {
     var array: lb.core.ArrayObj = undefined;
     _ = array.init(32, @sizeOf(test_struct));
 
-    try expectEqual(array.get(1), null);
-    try expectEqual(array.get(0), null);
+    try expectEqual(lb.core.arrayObjGet(&array, 1), null);
+    try expectEqual(lb.core.arrayObjGet(&array, 0), null);
 
     const entry = array.push();
     try expect(entry != null);
 
-    try expectEqual(array.get(0), entry);
-    try expectEqual(array.get(1), null);
-    try expectEqual(array.get(1000), null);
+    try expectEqual(lb.core.arrayObjGet(&array, 0), entry);
+    try expectEqual(lb.core.arrayObjGet(&array, 1), null);
+    try expectEqual(lb.core.arrayObjGet(&array, 1000), null);
 
     _ = array.destroy(false);
 }
@@ -126,7 +126,7 @@ test "delete" {
     try expectEqual(array.length, 10);
 
     for (0..10) |i| {
-        entry = @ptrCast(@alignCast(array.get(i)));
+        entry = @ptrCast(@alignCast(lb.core.arrayObjGet(&array, i)));
         try expectEqual(entry.data, @as(*allowzero c_char, @ptrFromInt(i)));
         try expectEqual(entry.len, i);
     }
@@ -140,57 +140,57 @@ test "delete" {
     array.delete(0, 0);
     try expectEqual(array.length, 6);
 
-    entry = @ptrCast(@alignCast(array.get(0)));
+    entry = @ptrCast(@alignCast(lb.core.arrayObjGet(&array, 0)));
     try expectEqual(entry.data, @as(*allowzero c_char, @ptrFromInt(0)));
     try expectEqual(entry.len, 0);
 
-    entry = @ptrCast(@alignCast(array.get(1)));
+    entry = @ptrCast(@alignCast(lb.core.arrayObjGet(&array, 1)));
     try expectEqual(entry.data, @as(*allowzero c_char, @ptrFromInt(1)));
     try expectEqual(entry.len, 1);
 
-    entry = @ptrCast(@alignCast(array.get(2)));
+    entry = @ptrCast(@alignCast(lb.core.arrayObjGet(&array, 2)));
     try expectEqual(entry.data, @as(*allowzero c_char, @ptrFromInt(2)));
     try expectEqual(entry.len, 2);
 
-    entry = @ptrCast(@alignCast(array.get(3)));
+    entry = @ptrCast(@alignCast(lb.core.arrayObjGet(&array, 3)));
     try expectEqual(entry.data, @as(*allowzero c_char, @ptrFromInt(3)));
     try expectEqual(entry.len, 3);
 
-    entry = @ptrCast(@alignCast(array.get(4)));
+    entry = @ptrCast(@alignCast(lb.core.arrayObjGet(&array, 4)));
     try expectEqual(entry.data, @as(*allowzero c_char, @ptrFromInt(8)));
     try expectEqual(entry.len, 8);
 
-    entry = @ptrCast(@alignCast(array.get(5)));
+    entry = @ptrCast(@alignCast(lb.core.arrayObjGet(&array, 5)));
     try expectEqual(entry.data, @as(*allowzero c_char, @ptrFromInt(9)));
     try expectEqual(entry.len, 9);
 
     array.delete(0, 1);
     try expectEqual(array.length, 5);
 
-    entry = @ptrCast(@alignCast(array.get(0)));
+    entry = @ptrCast(@alignCast(lb.core.arrayObjGet(&array, 0)));
     try expectEqual(entry.data, @as(*allowzero c_char, @ptrFromInt(1)));
     try expectEqual(entry.len, 1);
 
-    entry = @ptrCast(@alignCast(array.get(1)));
+    entry = @ptrCast(@alignCast(lb.core.arrayObjGet(&array, 1)));
     try expectEqual(entry.data, @as(*allowzero c_char, @ptrFromInt(2)));
     try expectEqual(entry.len, 2);
 
-    entry = @ptrCast(@alignCast(array.get(2)));
+    entry = @ptrCast(@alignCast(lb.core.arrayObjGet(&array, 2)));
     try expectEqual(entry.data, @as(*allowzero c_char, @ptrFromInt(3)));
     try expectEqual(entry.len, 3);
 
-    entry = @ptrCast(@alignCast(array.get(3)));
+    entry = @ptrCast(@alignCast(lb.core.arrayObjGet(&array, 3)));
     try expectEqual(entry.data, @as(*allowzero c_char, @ptrFromInt(8)));
     try expectEqual(entry.len, 8);
 
-    entry = @ptrCast(@alignCast(array.get(4)));
+    entry = @ptrCast(@alignCast(lb.core.arrayObjGet(&array, 4)));
     try expectEqual(entry.data, @as(*allowzero c_char, @ptrFromInt(9)));
     try expectEqual(entry.len, 9);
 
     array.delete(1, 1000);
     try expectEqual(array.length, 1);
 
-    entry = @ptrCast(@alignCast(array.get(0)));
+    entry = @ptrCast(@alignCast(lb.core.arrayObjGet(&array, 0)));
     try expectEqual(entry.data, @as(*allowzero c_char, @ptrFromInt(1)));
     try expectEqual(entry.len, 1);
 
@@ -257,15 +257,15 @@ test "erase" {
     _ = array.init(32, @sizeOf(test_struct));
 
     const e0 = array.push();
-    try expectEqual(array.get(0), e0);
+    try expectEqual(lb.core.arrayObjGet(&array, 0), e0);
 
     const e1 = array.push();
-    try expectEqual(array.get(1), e1);
+    try expectEqual(lb.core.arrayObjGet(&array, 1), e1);
 
-    array.erase();
+    lb.core.arrayObjErase(&array);
 
-    try expectEqual(array.get(0), null);
-    try expectEqual(array.get(1), null);
+    try expectEqual(lb.core.arrayObjGet(&array, 0), null);
+    try expectEqual(lb.core.arrayObjGet(&array, 1), null);
 
     _ = array.destroy(false);
 }

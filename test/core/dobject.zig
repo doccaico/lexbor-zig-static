@@ -99,7 +99,7 @@ test "obj_alloc_free_alloc" {
     _ = dobj.free(data);
 
     try expectEqual(dobj.allocated, 0);
-    try expectEqual(dobj.cacheLength(), 1);
+    try expectEqual(lb.core.dobjectCacheLength(&dobj), 1);
 
     data = dobj.alloc();
 
@@ -126,11 +126,11 @@ test "obj_cache" {
 
     for (0..data_size) |i| {
         _ = dobj.free(&data[i]);
-        try expectEqual(dobj.cacheLength(), i + 1);
+        try expectEqual(lb.core.dobjectCacheLength(&dobj), i + 1);
     }
 
     try expectEqual(dobj.allocated, 0);
-    try expectEqual(dobj.cacheLength(), 100);
+    try expectEqual(lb.core.dobjectCacheLength(&dobj), 100);
 
     _ = dobj.destroy(false);
 }
@@ -212,7 +212,7 @@ test "obj_free" {
     _ = dobj.free(data);
 
     try expectEqual(dobj.allocated, 0);
-    try expectEqual(dobj.cacheLength(), 1);
+    try expectEqual(lb.core.dobjectCacheLength(&dobj), 1);
 
     _ = dobj.destroy(false);
 }
@@ -226,7 +226,7 @@ test "clean" {
 
     dobj.clean();
     try expectEqual(dobj.allocated, 0);
-    try expectEqual(dobj.cacheLength(), 0);
+    try expectEqual(lb.core.dobjectCacheLength(&dobj), 0);
 
     _ = dobj.destroy(false);
 }

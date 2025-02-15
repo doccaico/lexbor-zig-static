@@ -3,6 +3,11 @@ const std = @import("std");
 
 const lb = @import("lexbor.zig");
 
+// libc
+
+extern fn memset(dest: ?*anyopaque, c: c_int, count: usize) ?*anyopaque;
+extern fn memcpy(dest: ?*anyopaque, src: ?*const anyopaque, count: usize) ?*anyopaque;
+
 // core/array.h
 
 pub const Array = extern struct {
@@ -50,13 +55,6 @@ pub const Array = extern struct {
         return lexbor_array_delete(self, begin, length);
     }
 
-    pub inline fn get(self: ?*Array, idx: usize) ?*anyopaque {
-        if (idx >= self.?.length) {
-            return null;
-        }
-        return self.?.list.?[idx];
-    }
-
     pub fn getNoi(self: ?*Array, idx: usize) ?*anyopaque {
         return lexbor_array_get_noi(self, idx);
     }
@@ -83,6 +81,22 @@ extern fn lexbor_array_delete(Array: ?*Array, begin: usize, length: usize) void;
 extern fn lexbor_array_get_noi(Array: ?*Array, idx: usize) ?*anyopaque;
 extern fn lexbor_array_length_noi(Array: ?*Array) usize;
 extern fn lexbor_array_size_noi(Array: ?*Array) usize;
+
+pub inline fn arrayGet(array: ?*Array, idx: usize) ?*anyopaque {
+    if (idx >= array.?.length) {
+        return null;
+    }
+
+    return array.?.list.?[idx];
+}
+
+pub inline fn arrayLength(array: ?*Array) usize {
+    return array.?.length;
+}
+
+pub inline fn arraySize(array: ?*Array) usize {
+    return array.?.size;
+}
 
 // core/array_obj.h
 
@@ -131,25 +145,6 @@ pub const ArrayObj = extern struct {
     pub fn delete(self: ?*ArrayObj, begin: usize, length: usize) void {
         return lexbor_array_obj_delete(self, begin, length);
     }
-
-    pub inline fn erase(self: ?*ArrayObj) void {
-        const slice = std.mem.asBytes(self.?);
-        @memset(slice, 0);
-    }
-
-    pub inline fn get(self: ?*ArrayObj, idx: usize) ?*anyopaque {
-        if (idx >= self.?.length) {
-            return null;
-        }
-        return self.?.list.? + (idx * self.?.struct_size);
-    }
-
-    pub inline fn last(self: ?*ArrayObj) ?*anyopaque {
-        if (self.?.length == 0) {
-            return null;
-        }
-        return self.?.list + ((self.?.length - 1) * self.?.struct_size);
-    }
 };
 
 extern fn lexbor_array_obj_create() ?*ArrayObj;
@@ -168,6 +163,36 @@ extern fn lexbor_array_obj_length_noi(array: ?*ArrayObj) usize;
 extern fn lexbor_array_obj_size_noi(array: ?*ArrayObj) usize;
 extern fn lexbor_array_obj_struct_size_noi(array: ?*ArrayObj) usize;
 extern fn lexbor_array_obj_last_noi(array: ?*ArrayObj) ?*anyopaque;
+
+pub inline fn arrayObjErase(array: ?*ArrayObj) void {
+    _ = memset(array.?, 0, @sizeOf(ArrayObj));
+}
+
+pub inline fn arrayObjGet(array: ?*ArrayObj, idx: usize) ?*anyopaque {
+    if (idx >= array.?.length) {
+        return null;
+    }
+    return array.?.list.? + (idx * array.?.struct_size);
+}
+
+pub inline fn arrayObjLength(array: ?*ArrayObj) void {
+    return array.?.length;
+}
+
+pub inline fn arrayObjSize(array: ?*ArrayObj) void {
+    return array.?.size;
+}
+
+pub inline fn arrayObjStructSize(array: ?*ArrayObj) void {
+    return array.?.struct_size;
+}
+
+pub inline fn arrayObjLast(array: ?*ArrayObj) ?*anyopaque {
+    if (array.?.length == 0) {
+        return null;
+    }
+    return array.?.list + ((array.?.length - 1) * array.?.struct_size);
+}
 
 // core/avl.h
 
@@ -304,6 +329,14 @@ pub const SerializeCtx = extern struct {
 
 // core/bst.h
 
+pub inline fn bstRoot(bst: ?*Bst) ?*BstEntry {
+    return bst.?.root;
+}
+
+pub inline fn bstRootRef(bst: ?*Bst) ?*?*BstEntry {
+    return &(bst.?.root);
+}
+
 pub const BstEntryF = ?*const fn (bst: ?*Bst, entry: ?*BstEntry, ctx: ?*anyopaque) callconv(.C) bool;
 
 pub const BstEntry = extern struct {
@@ -322,7 +355,6 @@ pub const BstEntry = extern struct {
 pub const Bst = extern struct {
     dobject: ?*Dobject,
     root: ?*BstEntry,
-
     tree_length: usize,
 
     pub fn create() ?*Bst {
@@ -448,6 +480,10 @@ extern fn lexbor_bst_map_insert_not_exists(bst_map: ?*BstMap, scope: ?*?*BstEntr
 extern fn lexbor_bst_map_remove(bst_map: ?*BstMap, scope: ?*?*BstEntry, key: ?*const char, key_len: usize) ?*anyopaque;
 extern fn lexbor_bst_map_mraw_noi(bst_map: ?*BstMap) ?*Mraw;
 
+pub inline fn bstMapMraw(bst_map: ?*BstMap) ?*Mraw {
+    return bst_map.?.mraw;
+}
+
 // core/conv.h
 
 pub const Conv = struct {
@@ -482,16 +518,6 @@ pub const Conv = struct {
     pub fn decToHex(number: u32, out: ?*char, length: usize) usize {
         return lexbor_conv_dec_to_hex(number, out, length);
     }
-
-    pub inline fn doubleToLong(number: f64) c_long {
-        if (number > std.math.maxInt(c_long)) {
-            return std.math.maxInt(c_long);
-        }
-        if (number < std.math.minInt(c_long)) {
-            return -std.math.maxInt(c_long);
-        }
-        return @trunc(number);
-    }
 };
 
 extern fn lexbor_conv_float_to_data(num: f64, buf: ?*char, len: usize) usize;
@@ -502,6 +528,16 @@ extern fn lexbor_conv_data_to_ulong(data: ?*const ?*char, length: usize) c_ulong
 extern fn lexbor_conv_data_to_long(data: ?*const ?*char, length: usize) c_long;
 extern fn lexbor_conv_data_to_uint(data: ?*const ?*char, length: usize) c_uint;
 extern fn lexbor_conv_dec_to_hex(number: u32, out: ?*char, length: usize) usize;
+
+pub inline fn convDoubleToLong(number: f64) c_long {
+    if (number > std.math.maxInt(c_long)) {
+        return std.math.maxInt(c_long);
+    }
+    if (number < std.math.minInt(c_long)) {
+        return -std.math.maxInt(c_long);
+    }
+    return @trunc(number);
+}
 
 // core/def.h
 
@@ -532,139 +568,137 @@ pub const Diyfp = extern struct {
     significand: u64,
     exp: c_int,
 
-    pub inline fn leadingZeros64(x: u64) u64 {
-        var n: u64 = undefined;
-
-        if (x == 0) {
-            return 64;
-        }
-
-        n = 0;
-
-        while ((x & 0x8000000000000000) == 0) {
-            n += 1;
-            x <<= 1;
-        }
-        return n;
-    }
-
-    pub inline fn fromD2(d: u64) Diyfp {
-        var biased_exp: c_int = undefined;
-        var significand: u64 = undefined;
-        var r: Diyfp = undefined;
-
-        const U = extern union {
-            d: f64,
-            u64_: u64,
-        };
-        var u = U{};
-
-        u.d = d;
-
-        biased_exp = (u.u64_ & DBL_EXPONENT_MASK) >> DBL_SIGNIFICAND_SIZE;
-        significand = u.u64_ & DBL_SIGNIFICAND_MASK;
-
-        if (biased_exp != 0) {
-            r.significand = significand + DBL_HIDDEN_BIT;
-            r.exp = biased_exp - DBL_EXPONENT_BIAS;
-        } else {
-            r.significand = significand;
-            r.exp = DBL_EXPONENT_MIN + 1;
-        }
-
-        return r;
-    }
-
-    pub inline fn @"2d"(v: Diyfp) f64 {
-        var exp: c_int = undefined;
-        var significand: u64 = undefined;
-        var biased_exp: u64 = undefined;
-
-        const U = extern union {
-            d: f64,
-            u64_: u64,
-        };
-        var u = U{};
-
-        exp = v.exp;
-        significand = v.significand;
-
-        while (significand > DBL_HIDDEN_BIT + DBL_SIGNIFICAND_MASK) {
-            significand >>= 1;
-            exp += 1;
-        }
-
-        if (exp >= DBL_EXPONENT_MAX) {
-            return std.math.inf(f64);
-        }
-
-        if (exp < DBL_EXPONENT_DENORMAL) {
-            return 0.0;
-        }
-
-        while (exp > DBL_EXPONENT_DENORMAL and (significand & DBL_HIDDEN_BIT) == 0) {
-            significand <<= 1;
-            exp -= 1;
-        }
-
-        if (exp == DBL_EXPONENT_DENORMAL and (significand & DBL_HIDDEN_BIT) == 0) {
-            biased_exp = 0;
-        } else {
-            biased_exp = @intCast(exp + DBL_EXPONENT_BIAS);
-        }
-
-        u.u64_ = (significand & DBL_SIGNIFICAND_MASK) | (biased_exp << DBL_SIGNIFICAND_SIZE);
-
-        return u.d;
-    }
-
-    pub inline fn shiftLeft(v: Diyfp, shift: c_uint) Diyfp {
-        return Diyfp{ .significand = v.significand << shift, .exp = v.exp - shift };
-    }
-
-    pub inline fn shiftRight(v: Diyfp, shift: c_uint) Diyfp {
-        return Diyfp{ .significand = v.significand >> shift, .exp = v.exp + shift };
-    }
-
-    pub inline fn sub(lhs: Diyfp, rhs: Diyfp) Diyfp {
-        return Diyfp{ .significand = lhs.significand - rhs.significand, .exp = lhs.exp };
-    }
-
-    pub inline fn mul(lhs: Diyfp, rhs: Diyfp) Diyfp {
-        const a: u64 = lhs.significand >> 32;
-        const b: u64 = lhs.significand & 0xffffffff;
-        const c: u64 = rhs.significand >> 32;
-        const d: u64 = rhs.significand & 0xffffffff;
-
-        const ac: u64 = a * c;
-        const bc: u64 = b * c;
-        const ad: u64 = a * d;
-        const bd: u64 = b * d;
-
-        var tmp: u64 = (bd >> 32) + (ad & 0xffffffff) + (bc & 0xffffffff);
-
-        tmp += @as(c_uint, 1) << 31;
-
-        return Diyfp{ .significand = ac + (ad >> 32) + (bc >> 32) + (tmp >> 32), .exp = lhs.exp + rhs.exp + 64 };
-    }
-
-    pub inline fn normalize(v: Diyfp) Diyfp {
-        return shiftLeft(v, leadingZeros64(v.significand));
-    }
-};
-
-pub const CachedPower = extern struct {
-    pub fn dec(exp: c_int, dec_exp: ?*c_int) Diyfp {
+    pub fn cachedPowerDec(exp: c_int, dec_exp: ?*c_int) Diyfp {
         return lexbor_cached_power_dec(exp, dec_exp);
     }
 
-    pub fn bin(exp: c_int, dec_exp: ?*c_int) Diyfp {
+    pub fn cachedPowerBin(exp: c_int, dec_exp: ?*c_int) Diyfp {
         return lexbor_cached_power_bin(exp, dec_exp);
     }
 };
 
 extern fn lexbor_cached_power_dec(exp: c_int, dec_exp: ?*c_int) Diyfp;
 extern fn lexbor_cached_power_bin(exp: c_int, dec_exp: ?*c_int) Diyfp;
+
+pub inline fn diyfpLeadingZeros64(x: u64) u64 {
+    var n: u64 = undefined;
+
+    if (x == 0) {
+        return 64;
+    }
+
+    n = 0;
+
+    while ((x & 0x8000000000000000) == 0) {
+        n += 1;
+        x <<= 1;
+    }
+    return n;
+}
+
+pub inline fn diyfpFromD2(d: u64) Diyfp {
+    var biased_exp: c_int = undefined;
+    var significand: u64 = undefined;
+    var r: Diyfp = undefined;
+
+    const U = extern union {
+        d: f64,
+        u64_: u64,
+    };
+    var u = U{};
+
+    u.d = d;
+
+    biased_exp = (u.u64_ & DBL_EXPONENT_MASK) >> DBL_SIGNIFICAND_SIZE;
+    significand = u.u64_ & DBL_SIGNIFICAND_MASK;
+
+    if (biased_exp != 0) {
+        r.significand = significand + DBL_HIDDEN_BIT;
+        r.exp = biased_exp - DBL_EXPONENT_BIAS;
+    } else {
+        r.significand = significand;
+        r.exp = DBL_EXPONENT_MIN + 1;
+    }
+
+    return r;
+}
+
+pub inline fn diyfp2d(v: Diyfp) f64 {
+    var exp: c_int = undefined;
+    var significand: u64 = undefined;
+    var biased_exp: u64 = undefined;
+
+    const U = extern union {
+        d: f64,
+        u64_: u64,
+    };
+    var u = U{};
+
+    exp = v.exp;
+    significand = v.significand;
+
+    while (significand > DBL_HIDDEN_BIT + DBL_SIGNIFICAND_MASK) {
+        significand >>= 1;
+        exp += 1;
+    }
+
+    if (exp >= DBL_EXPONENT_MAX) {
+        return std.math.inf(f64);
+    }
+
+    if (exp < DBL_EXPONENT_DENORMAL) {
+        return 0.0;
+    }
+
+    while (exp > DBL_EXPONENT_DENORMAL and (significand & DBL_HIDDEN_BIT) == 0) {
+        significand <<= 1;
+        exp -= 1;
+    }
+
+    if (exp == DBL_EXPONENT_DENORMAL and (significand & DBL_HIDDEN_BIT) == 0) {
+        biased_exp = 0;
+    } else {
+        biased_exp = @intCast(exp + DBL_EXPONENT_BIAS);
+    }
+
+    u.u64_ = (significand & DBL_SIGNIFICAND_MASK) | (biased_exp << DBL_SIGNIFICAND_SIZE);
+
+    return u.d;
+}
+
+pub inline fn diyfpShiftLeft(v: Diyfp, shift: c_uint) Diyfp {
+    return Diyfp{ .significand = v.significand << shift, .exp = v.exp - shift };
+}
+
+pub inline fn diyfpShiftRight(v: Diyfp, shift: c_uint) Diyfp {
+    return Diyfp{ .significand = v.significand >> shift, .exp = v.exp + shift };
+}
+
+pub inline fn diyfpSub(lhs: Diyfp, rhs: Diyfp) Diyfp {
+    return Diyfp{ .significand = lhs.significand - rhs.significand, .exp = lhs.exp };
+}
+
+pub inline fn diyfpMul(lhs: Diyfp, rhs: Diyfp) Diyfp {
+    const a: u64 = lhs.significand >> 32;
+    const b: u64 = lhs.significand & 0xffffffff;
+    const c: u64 = rhs.significand >> 32;
+    const d: u64 = rhs.significand & 0xffffffff;
+
+    const ac: u64 = a * c;
+    const bc: u64 = b * c;
+    const ad: u64 = a * d;
+    const bd: u64 = b * d;
+
+    var tmp: u64 = (bd >> 32) + (ad & 0xffffffff) + (bc & 0xffffffff);
+
+    tmp += @as(c_uint, 1) << 31;
+
+    return Diyfp{ .significand = ac + (ad >> 32) + (bc >> 32) + (tmp >> 32), .exp = lhs.exp + rhs.exp + 64 };
+}
+
+pub inline fn diyfpNormalize(v: Diyfp) Diyfp {
+    return diyfpShiftLeft(v, diyfpLeadingZeros64(v.significand));
+}
 
 // core/dobject.h
 
@@ -710,8 +744,12 @@ pub const Dobject = extern struct {
         return lexbor_dobject_by_absolute_position(self, pos);
     }
 
-    pub fn cacheLength(self: ?*Dobject) usize {
-        return self.?.cache.?.length;
+    pub fn allocatedNoi(self: ?*Dobject) usize {
+        return lexbor_dobject_allocated_noi(self);
+    }
+
+    pub fn cacheLengthNoi(self: ?*Dobject) usize {
+        return lexbor_dobject_cache_length_noi(self);
     }
 };
 
@@ -726,6 +764,14 @@ extern fn lexbor_dobject_free(Dobject: ?*Dobject, data: ?*anyopaque) ?*anyopaque
 extern fn lexbor_dobject_by_absolute_position(Dobject: ?*Dobject, pos: usize) ?*anyopaque;
 extern fn lexbor_dobject_allocated_noi(Dobject: ?*Dobject) usize;
 extern fn lexbor_dobject_cache_length_noi(Dobject: ?*Dobject) usize;
+
+pub inline fn dobjectAllocated(dobject: ?*Dobject) usize {
+    return dobject.?.allocated;
+}
+
+pub inline fn dobjectCacheLength(dobject: ?*Dobject) usize {
+    return arrayLength(dobject.?.cache);
+}
 
 // core/dtoa.h
 
@@ -757,17 +803,21 @@ pub const FsFileType = enum(c_int) {
     socket = 0x07,
 };
 
-pub fn fsDirRead(dirpath: ?*const char, opt: c_int, callback: fsDirFileF, ctx: ?*anyopaque) status {
-    return lexbor_fs_dir_read(dirpath, opt, callback, ctx);
-}
+pub const FsDir = extern struct {
+    pub fn read(dirpath: ?*const char, opt: c_int, callback: fsDirFileF, ctx: ?*anyopaque) status {
+        return lexbor_fs_dir_read(dirpath, opt, callback, ctx);
+    }
+};
 
-pub fn fsFileType(full_path: ?*const char) FsFileType {
-    return lexbor_fs_file_type(full_path);
-}
+pub const FsFile = extern struct {
+    pub fn @"type"(full_path: ?*const char) FsFileType {
+        return lexbor_fs_file_type(full_path);
+    }
 
-pub fn fsFileEasyRead(full_path: ?*const char, len: ?*usize) ?*char {
-    return lexbor_fs_file_easy_read(full_path, len);
-}
+    pub fn easyRead(full_path: ?*const char, len: ?*usize) ?*char {
+        return lexbor_fs_file_easy_read(full_path, len);
+    }
+};
 
 extern fn lexbor_fs_dir_read(dirpath: ?*const char, opt: c_int, callback: fsDirFileF, ctx: ?*anyopaque) status;
 extern fn lexbor_fs_file_type(full_path: ?*const char) FsFileType;
@@ -787,9 +837,7 @@ pub const HashEntry = extern struct {
         long_str: ?*char,
         short_str: [HASH_SHORT_SIZE + 1]char,
     },
-
     length: usize,
-
     next: ?*HashEntry,
 };
 
@@ -842,6 +890,38 @@ pub const Hash = extern struct {
     pub fn search(self: ?*Hash, search_: ?*const HashSearch, key: ?*const char, length: usize) ?*anyopaque {
         return lexbor_hash_search(self, search_, key, length);
     }
+
+    pub fn removeByHashId(self: ?*Hash, hash_id: u32, key: ?*const char, length: usize, cmp_func: hashCmpF) void {
+        return lexbor_hash_remove_by_hash_id(self, hash_id, key, length, cmp_func);
+    }
+
+    pub fn searchByHashId(self: ?*Hash, hash_id: u32, key: ?*const char, length: usize, cmp_func: hashCmpF) ?*anyopaque {
+        return lexbor_hash_search_by_hash_id(self, hash_id, key, length, cmp_func);
+    }
+
+    pub fn makeId(key: ?*const char, length: usize) u32 {
+        return lexbor_hash_make_id(key, length);
+    }
+
+    pub fn makeIdLower(key: ?*const char, length: usize) u32 {
+        return lexbor_hash_make_id_lower(key, length);
+    }
+
+    pub fn makeIdUpper(key: ?*const char, length: usize) u32 {
+        return lexbor_hash_make_id_upper(key, length);
+    }
+
+    pub fn copy(self: ?*Hash, entry: ?*HashEntry, key: ?*const char, length: usize) status {
+        return lexbor_hash_copy(self, entry, key, length);
+    }
+
+    pub fn copyLower(self: ?*Hash, entry: ?*HashEntry, key: ?*const char, length: usize) status {
+        return lexbor_hash_copy_lower(self, entry, key, length);
+    }
+
+    pub fn copyUpper(self: ?*Hash, entry: ?*HashEntry, key: ?*const char, length: usize) status {
+        return lexbor_hash_copy_upper(self, entry, key, length);
+    }
 };
 
 extern fn lexbor_hash_create() ?*Hash;
@@ -858,8 +938,27 @@ extern fn lexbor_hash_make_id(key: ?*const char, length: usize) u32;
 extern fn lexbor_hash_make_id_lower(key: ?*const char, length: usize) u32;
 extern fn lexbor_hash_make_id_upper(key: ?*const char, length: usize) u32;
 extern fn lexbor_hash_copy(hash: ?*Hash, entry: ?*HashEntry, key: ?*const char, length: usize) status;
-extern fn lexbor_hash_lower(hash: ?*Hash, entry: ?*HashEntry, key: ?*const char, length: usize) status;
-extern fn lexbor_hash_upper(hash: ?*Hash, entry: ?*HashEntry, key: ?*const char, length: usize) status;
+extern fn lexbor_hash_copy_lower(hash: ?*Hash, entry: ?*HashEntry, key: ?*const char, length: usize) status;
+extern fn lexbor_hash_copy_upper(hash: ?*Hash, entry: ?*HashEntry, key: ?*const char, length: usize) status;
+
+pub inline fn hashStr(entry: ?*HashEntry) ?*char {
+    if (entry.?.length <= HASH_SHORT_SIZE) {
+        return entry.?.u.short_str;
+    }
+    return entry.?.u.long_str;
+}
+
+pub inline fn hashStrSet(entry: ?*HashEntry, data: ?*char, length: usize) ?*char {
+    entry.?.length = length;
+
+    if (length <= HASH_SHORT_SIZE) {
+        _ = memcpy(entry.?.u.short_str, data, length);
+        return entry.?.u.short_str;
+    }
+
+    entry.?.u.long_str = data;
+    return entry.?.u.long_str;
+}
 
 // core/mem.h
 
