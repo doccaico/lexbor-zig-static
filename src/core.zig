@@ -828,6 +828,14 @@ extern fn lexbor_fs_file_easy_read(full_path: ?*const char, len: ?*usize) ?*char
 pub const HASH_SHORT_SIZE = 16;
 pub const HASH_TABLE_MIN_SIZE = 32;
 
+pub const hashInsertRaw = @extern(**const HashInsert, .{ .name = "lexbor_hash_insert_raw" });
+pub const hashInsertLower = @extern(**const HashInsert, .{ .name = "lexbor_hash_insert_lower" });
+pub const hashInsertUpper = @extern(**const HashInsert, .{ .name = "lexbor_hash_insert_upper" });
+
+pub const hashSearchRaw = @extern(**const HashSearch, .{ .name = "lexbor_hash_search_raw" });
+pub const hashSearchLower = @extern(**const HashSearch, .{ .name = "lexbor_hash_search_lower" });
+pub const hashSearchUpper = @extern(**const HashSearch, .{ .name = "lexbor_hash_search_upper" });
+
 pub const hashIdF = ?*const fn (key: ?*const char, len: usize) callconv(.C) u32;
 pub const hashCopyF = ?*const fn (hash: ?*Hash, entry: ?*HashEntry, key: ?*const char, len: usize) callconv(.C) status;
 pub const hashCmpF = ?*const fn (first: ?*const char, second: ?*const char, size: usize) callconv(.C) bool;
@@ -976,7 +984,7 @@ pub inline fn hashEntryDestroy(hash: ?*Hash, entry: ?*HashEntry) ?*HashEntry {
     return @as(?*HashEntry, @ptrCast(@alignCast(lexbor_dobject_free(hash.?.entries, @as(?*anyopaque, @ptrCast(entry))))));
 }
 
-pub inline fn hashEntryCount(hash: ?*Hash) usize {
+pub inline fn hashEntriesCount(hash: ?*Hash) usize {
     return dobjectAllocated(hash.?.entries);
 }
 
