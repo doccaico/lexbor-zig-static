@@ -1131,7 +1131,7 @@ pub const Mem = extern struct {
     }
 
     pub fn clean(self: ?*Mem) void {
-        return lexbor_mem_clean(self);
+        lexbor_mem_clean(self);
     }
 
     pub fn destroy(self: ?*Mem, destroy_self: bool) ?*Mem {
