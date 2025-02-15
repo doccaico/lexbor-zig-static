@@ -988,6 +988,122 @@ pub inline fn hashEntriesCount(hash: ?*Hash) usize {
     return dobjectAllocated(hash.?.entries);
 }
 
+// core/in.h
+
+pub const InOpt = enum(c_int) {
+    undef = 0x00,
+    readonly = 0x01,
+    done = 0x02,
+    fake = 0x04,
+    alloc = 0x08,
+};
+
+pub const In = extern struct {
+    nodes: ?*Dobject,
+
+    pub fn create() ?*In {
+        return lexbor_in_create();
+    }
+
+    pub fn init(self: ?*In, chunk_size: usize) status {
+        return lexbor_in_init(self, chunk_size);
+    }
+
+    pub fn clean(self: ?*In) void {
+        return lexbor_in_clean(self);
+    }
+
+    pub fn destroy(self: ?*In, self_destroy: bool) ?*In {
+        return lexbor_in_destroy(self, self_destroy);
+    }
+
+    pub fn nodeMake(self: ?*In, last_node: ?*InNode, buf: ?*const char, buf_size: usize) ?*InNode {
+        return lexbor_in_node_make(self, last_node, buf, buf_size);
+    }
+
+    pub fn nodeDestroy(self: ?*In, node: ?*InNode, self_destroy: bool) ?*InNode {
+        return lexbor_in_node_destroy(self, node, self_destroy);
+    }
+};
+
+pub const InNode = extern struct {
+    offset: usize,
+    opt: InOpt,
+    begin: ?*const char,
+    end: ?*const char,
+    use: ?*const char,
+    next: ?*InNode,
+    prev: ?*InNode,
+    incoming: ?*In,
+
+    pub fn clean(self: ?*InNode) void {
+        return lexbor_in_node_clean(self);
+    }
+
+    pub fn split(self: ?*InNode, pos: ?*const char) ?*InNode {
+        return lexbor_in_node_split(self, pos);
+    }
+
+    pub fn find(self: ?*InNode, pos: ?*const char) ?*InNode {
+        return lexbor_in_node_find(self, pos);
+    }
+
+    pub fn posUp(self: ?*InNode, return_node: ?*?*InNode, pos: ?*const char, offset: usize) ?*const char {
+        return lexbor_in_node_pos_up(self, return_node, pos, offset);
+    }
+
+    pub fn posDown(self: ?*InNode, return_node: ?*?*InNode, pos: ?*const char, offset: usize) ?*const char {
+        return lexbor_in_node_pos_down(self, return_node, pos, offset);
+    }
+};
+
+extern fn lexbor_in_create() ?*In;
+extern fn lexbor_in_init(incoming: ?*In, chunk_size: usize) status;
+extern fn lexbor_in_clean(incoming: ?*In) void;
+extern fn lexbor_in_destroy(incoming: ?*In, self_destroy: bool) ?*In;
+extern fn lexbor_in_node_make(incoming: ?*In, last_node: ?*InNode, buf: ?*const char, buf_size: usize) ?*InNode;
+extern fn lexbor_in_node_clean(node: ?*InNode) void;
+extern fn lexbor_in_node_destroy(incoming: ?*In, node: ?*InNode, self_destroy: bool) ?*InNode;
+extern fn lexbor_in_node_split(node: ?*InNode, pos: ?*const char) ?*InNode;
+extern fn lexbor_in_node_find(node: ?*InNode, pos: ?*const char) ?*InNode;
+extern fn lexbor_in_node_pos_up(node: ?*InNode, return_node: ?*?*InNode, pos: ?*const char, offset: usize) ?*const char;
+extern fn lexbor_in_node_pos_down(node: ?*InNode, return_node: ?*?*InNode, pos: ?*const char, offset: usize) ?*const char;
+extern fn lexbor_in_node_begin_noi(node: ?*const InNode) ?*const char;
+extern fn lexbor_in_node_end_noi(node: ?*const InNode) ?*const char;
+extern fn lexbor_in_node_offset_noi(node: ?*const InNode) usize;
+extern fn lexbor_in_node_next_noi(node: ?*const InNode) ?*InNode;
+extern fn lexbor_in_node_prev_noi(node: ?*const InNode) ?*InNode;
+extern fn lexbor_in_node_in_noi(node: ?*const InNode) ?*In;
+extern fn lexbor_in_segment_noi(node: ?*const InNode, data: ?*const char) bool;
+
+pub inline fn inNodeBegin(node: ?*const InNode) ?*const char {
+    return node.?.begin;
+}
+
+pub inline fn inNodeEnd(node: ?*const InNode) ?*const char {
+    return node.?.end;
+}
+
+pub inline fn inNodeOffset(node: ?*const InNode) usize {
+    return node.?.offset;
+}
+
+pub inline fn inNodeNext(node: ?*const InNode) ?*InNode {
+    return node.?.next;
+}
+
+pub inline fn inNodePrev(node: ?*const InNode) ?*InNode {
+    return node.?.prev;
+}
+
+pub inline fn inNodeIn(node: ?*const InNode) ?*In {
+    return node.?.incoming;
+}
+
+pub inline fn inSegment(node: ?*const InNode, data: ?*const char) bool {
+    return &node.?.begin.?[0] <= &data[0] and &node.?.end.?[0] >= &data[0];
+}
+
 // core/mem.h
 
 pub const MemChunk = extern struct {
