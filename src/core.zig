@@ -1156,6 +1156,8 @@ extern fn lexbor_calloc(num: usize, size: usize) ?*anyopaque;
 extern fn lexbor_free(dst: ?*anyopaque) void;
 extern fn lexbor_memory_setup(new_malloc: Memory.mallocF, new_realloc: Memory.reallocF, new_calloc: Memory.callocF, new_free: Memory.freeF) void;
 
+// core/mem.h
+
 // core/types.h
 
 pub const codepoint = u32;
