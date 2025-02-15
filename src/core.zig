@@ -541,6 +541,8 @@ pub inline fn convDoubleToLong(number: f64) c_long {
 
 // core/def.h
 
+pub const MEM_ALIGN_STEP = @sizeOf(*anyopaque);
+
 // core/diyfp.h
 
 pub inline fn uint64Hl(h: anytype, l: anytype) u64 {
@@ -1119,7 +1121,78 @@ pub const Mem = extern struct {
     chunk_first: ?*MemChunk,
     chunk_min_size: usize,
     chunk_length: usize,
+
+    pub fn create() ?*Mem {
+        return lexbor_mem_create();
+    }
+
+    pub fn init(self: ?*Mem, min_chunk_size: usize) status {
+        return lexbor_mem_init(self, min_chunk_size);
+    }
+
+    pub fn clean(self: ?*Mem) void {
+        return lexbor_mem_clean(self);
+    }
+
+    pub fn destroy(self: ?*Mem, destroy_self: bool) ?*Mem {
+        return lexbor_mem_destroy(self, destroy_self);
+    }
+
+    pub fn chunkInit(self: ?*Mem, chunk: ?*MemChunk, length: usize) ?*u8 {
+        return lexbor_mem_chunk_init(self, chunk, length);
+    }
+
+    pub fn chunkMake(self: ?*Mem, length: usize) ?*MemChunk {
+        return lexbor_mem_chunk_make(self, length);
+    }
+
+    pub fn chunkDestroy(self: ?*Mem, chunk: ?*MemChunk, self_destroy: bool) ?*MemChunk {
+        return lexbor_mem_chunk_destroy(self, chunk, self_destroy);
+    }
+
+    pub fn alloc(self: ?*Mem, length: usize) ?*anyopaque {
+        return lexbor_mem_alloc(self, length);
+    }
+
+    pub fn calloc(self: ?*Mem, length: usize) ?*anyopaque {
+        return lexbor_mem_calloc(self, length);
+    }
 };
+
+extern fn lexbor_mem_create() ?*Mem;
+extern fn lexbor_mem_init(mem: ?*Mem, min_chunk_size: usize) status;
+extern fn lexbor_mem_clean(mem: ?*Mem) void;
+extern fn lexbor_mem_destroy(mem: ?*Mem, destroy_self: bool) ?*Mem;
+extern fn lexbor_mem_chunk_init(mem: ?*Mem, chunk: ?*MemChunk, length: usize) ?*u8;
+extern fn lexbor_mem_chunk_make(mem: ?*Mem, length: usize) ?*MemChunk;
+extern fn lexbor_mem_chunk_destroy(mem: ?*Mem, chunk: ?*MemChunk, self_destroy: bool) ?*MemChunk;
+extern fn lexbor_mem_alloc(mem: ?*Mem, length: usize) ?*anyopaque;
+extern fn lexbor_mem_calloc(mem: ?*Mem, length: usize) ?*anyopaque;
+extern fn lexbor_mem_current_length_noi(mem: ?*Mem) usize;
+extern fn lexbor_mem_current_size_noi(mem: ?*Mem) usize;
+extern fn lexbor_mem_chunk_length_noi(mem: ?*Mem) usize;
+extern fn lexbor_mem_align_noi(size: usize) usize;
+extern fn lexbor_mem_align_floor_noi(size: usize) usize;
+
+pub inline fn memCurrentLength(mem: ?*Mem) usize {
+    return mem.?.chunk.?.length;
+}
+
+pub inline fn memCurrentSize(mem: ?*Mem) usize {
+    return mem.?.chunk.?.size;
+}
+
+pub inline fn memChunkLength(mem: ?*Mem) usize {
+    return mem.?.chunk_length;
+}
+
+pub inline fn memAlign(size: usize) usize {
+    return if ((size % MEM_ALIGN_STEP) != 0) size + (MEM_ALIGN_STEP - (size % MEM_ALIGN_STEP)) else size;
+}
+
+pub inline fn memAlignFloor(size: usize) usize {
+    return if ((size % MEM_ALIGN_STEP) != 0) size - (size % MEM_ALIGN_STEP) else size;
+}
 
 // core/lexbor.h
 
