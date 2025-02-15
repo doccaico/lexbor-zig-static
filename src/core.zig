@@ -1029,9 +1029,9 @@ pub const In = extern struct {
 pub const InNode = extern struct {
     offset: usize,
     opt: InOpt,
-    begin: ?*const char,
-    end: ?*const char,
-    use: ?*const char,
+    begin: ?[*]const char,
+    end: ?[*]const char,
+    use: ?[*]const char,
     next: ?*InNode,
     prev: ?*InNode,
     incoming: ?*In,
@@ -1076,11 +1076,11 @@ extern fn lexbor_in_node_prev_noi(node: ?*const InNode) ?*InNode;
 extern fn lexbor_in_node_in_noi(node: ?*const InNode) ?*In;
 extern fn lexbor_in_segment_noi(node: ?*const InNode, data: ?*const char) bool;
 
-pub inline fn inNodeBegin(node: ?*const InNode) ?*const char {
+pub inline fn inNodeBegin(node: ?*const InNode) ?[*]const char {
     return node.?.begin;
 }
 
-pub inline fn inNodeEnd(node: ?*const InNode) ?*const char {
+pub inline fn inNodeEnd(node: ?*const InNode) ?[*]const char {
     return node.?.end;
 }
 

@@ -583,6 +583,7 @@ fn compileSingle(b: *Build, static_options: StaticLibraryOptions) *Compile {
 const cflags = [_][]const u8{
     "-std=c99",
     "-DLEXBOR_STATIC",
+    "-fno-sanitize=undefined",
 };
 
 const cflags_ports = [_][]const u8{
@@ -590,6 +591,7 @@ const cflags_ports = [_][]const u8{
     "-pedantic",
     "-pipe",
     "-std=c99",
+    "-fno-sanitize=undefined",
 };
 
 const core_src = [_][]const u8{

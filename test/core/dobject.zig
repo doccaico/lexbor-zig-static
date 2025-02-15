@@ -2,7 +2,6 @@ const std = @import("std");
 const expect = std.testing.expect;
 const expectEqual = std.testing.expectEqual;
 const zeroInit = std.mem.zeroInit;
-// const expectEqualStrings = std.testing.expectEqualStrings;
 
 const lb = @import("lexbor");
 
