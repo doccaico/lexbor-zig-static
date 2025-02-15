@@ -5,9 +5,9 @@ const zeroInit = std.mem.zeroInit;
 
 const lb = @import("lexbor");
 
-fn test_for_push(bst: *lb.core.bst) !void {
-    var entry: *lb.core.bstEntry = undefined;
-    var pushed: ?*lb.core.bstEntry = undefined;
+fn test_for_push(bst: *lb.core.Bst) !void {
+    var entry: *lb.core.BstEntry = undefined;
+    var pushed: ?*lb.core.BstEntry = undefined;
 
     try expect(bst.insert(&bst.root, 5, @as(*anyopaque, @ptrFromInt(5))) != null);
     try expect(bst.insert(&bst.root, 2, @as(*anyopaque, @ptrFromInt(2))) != null);
@@ -23,7 +23,7 @@ fn test_for_push(bst: *lb.core.bst) !void {
 }
 
 test "init" {
-    var bst = lb.core.bst.create().?;
+    var bst = lb.core.Bst.create().?;
     const status = bst.init(128);
 
     try expectEqual(status, @intFromEnum(lb.core.Status.ok));
@@ -32,12 +32,12 @@ test "init" {
 }
 
 test "init_null" {
-    const status = lb.core.bst.init(null, 128);
+    const status = lb.core.Bst.init(null, 128);
     try expectEqual(status, @intFromEnum(lb.core.Status.error_object_is_null));
 }
 
 test "init_stack" {
-    var bst: lb.core.bst = undefined;
+    var bst: lb.core.Bst = undefined;
     const status = bst.init(128);
 
     try expectEqual(status, @intFromEnum(lb.core.Status.ok));
@@ -46,7 +46,7 @@ test "init_stack" {
 }
 
 test "init_args" {
-    var bst = zeroInit(lb.core.bst, .{});
+    var bst = zeroInit(lb.core.Bst, .{});
     var status: lb.core.status = undefined;
 
     status = bst.init(0);
@@ -56,8 +56,8 @@ test "init_args" {
 }
 
 test "bst_insert" {
-    var bst: lb.core.bst = undefined;
-    var entry: *lb.core.bstEntry = undefined;
+    var bst: lb.core.Bst = undefined;
+    var entry: *lb.core.BstEntry = undefined;
 
     try expectEqual(bst.init(128), @intFromEnum(lb.core.Status.ok));
 
@@ -77,8 +77,8 @@ test "bst_insert" {
 }
 
 test "bst_search" {
-    var bst: lb.core.bst = undefined;
-    var entry: ?*lb.core.bstEntry = undefined;
+    var bst: lb.core.Bst = undefined;
+    var entry: ?*lb.core.BstEntry = undefined;
 
     try expectEqual(bst.init(128), @intFromEnum(lb.core.Status.ok));
 
@@ -92,8 +92,8 @@ test "bst_search" {
 }
 
 test "bst_search_close" {
-    var bst: lb.core.bst = undefined;
-    var entry: ?*lb.core.bstEntry = undefined;
+    var bst: lb.core.Bst = undefined;
+    var entry: ?*lb.core.BstEntry = undefined;
 
     try expectEqual(bst.init(128), @intFromEnum(lb.core.Status.ok));
 
@@ -114,8 +114,8 @@ test "bst_search_close" {
 }
 
 test "bst_search_close_more" {
-    var bst: lb.core.bst = undefined;
-    var entry: ?*lb.core.bstEntry = undefined;
+    var bst: lb.core.Bst = undefined;
+    var entry: ?*lb.core.BstEntry = undefined;
 
     try expectEqual(bst.init(128), @intFromEnum(lb.core.Status.ok));
 
@@ -166,7 +166,7 @@ test "bst_search_close_more" {
 }
 
 test "bst_remove" {
-    var bst: lb.core.bst = undefined;
+    var bst: lb.core.Bst = undefined;
     var value: ?*anyopaque = undefined;
     try expectEqual(bst.init(128), @intFromEnum(lb.core.Status.ok));
 
@@ -187,7 +187,7 @@ test "bst_remove" {
 }
 
 test "bst_remove_one_child" {
-    var bst: lb.core.bst = undefined;
+    var bst: lb.core.Bst = undefined;
     var value: ?*anyopaque = undefined;
     try expectEqual(bst.init(128), @intFromEnum(lb.core.Status.ok));
 
@@ -206,7 +206,7 @@ test "bst_remove_one_child" {
 }
 
 test "bst_remove_two_child" {
-    var bst: lb.core.bst = undefined;
+    var bst: lb.core.Bst = undefined;
     var value: ?*anyopaque = undefined;
     try expectEqual(bst.init(128), @intFromEnum(lb.core.Status.ok));
 
@@ -251,7 +251,7 @@ test "bst_remove_two_child" {
 }
 
 test "bst_remove_root_two_child" {
-    var bst: lb.core.bst = undefined;
+    var bst: lb.core.Bst = undefined;
     var value: ?*anyopaque = undefined;
     try expectEqual(bst.init(128), @intFromEnum(lb.core.Status.ok));
 
@@ -272,7 +272,7 @@ test "bst_remove_root_two_child" {
 }
 
 test "bst_remove_close" {
-    var bst: lb.core.bst = undefined;
+    var bst: lb.core.Bst = undefined;
     var value: ?*anyopaque = undefined;
     try expectEqual(bst.init(128), @intFromEnum(lb.core.Status.ok));
 
@@ -293,7 +293,7 @@ test "bst_remove_close" {
 }
 
 test "clean" {
-    var bst: lb.core.bst = undefined;
+    var bst: lb.core.Bst = undefined;
     try expectEqual(bst.init(128), @intFromEnum(lb.core.Status.ok));
 
     const entry = bst.insert(&bst.root, 100, null);
@@ -317,11 +317,11 @@ test "destroy" {
 
     try expectEqual(bst.destroy(false), bst);
     try expectEqual(bst.destroy(true), null);
-    try expectEqual(lb.core.bst.destroy(null, false), null);
+    try expectEqual(lb.core.Bst.destroy(null, false), null);
 }
 
 test "destroy_stack" {
-    var bst: lb.core.bst = undefined;
+    var bst: lb.core.Bst = undefined;
     try expectEqual(bst.init(128), @intFromEnum(lb.core.Status.ok));
 
     try expectEqual(bst.destroy(false), &bst);

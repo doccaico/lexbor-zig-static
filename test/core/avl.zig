@@ -11,7 +11,7 @@ pub const avlTestCtx = struct {
     p: ?*usize,
 };
 
-fn avl_cb(avl: ?*lb.core.avl, root: ?*?*lb.core.avlNode, node: ?*lb.core.avlNode, ctx: ?*anyopaque) callconv(.C) lb.core.status {
+fn avl_cb(avl: ?*lb.core.Avl, root: ?*?*lb.core.AvlNode, node: ?*lb.core.AvlNode, ctx: ?*anyopaque) callconv(.C) lb.core.status {
     const t = ctx;
 
     @as(*avlTestCtx, @ptrCast(@alignCast(t.?))).p.?.* = node.?.type;
@@ -28,7 +28,7 @@ fn avl_cb(avl: ?*lb.core.avl, root: ?*?*lb.core.avlNode, node: ?*lb.core.avlNode
 }
 
 test "init" {
-    var avl = lb.core.avl.create().?;
+    var avl = lb.core.Avl.create().?;
     const status = avl.init(1024, 0);
 
     try expectEqual(status, @intFromEnum(lb.core.Status.ok));
@@ -37,12 +37,12 @@ test "init" {
 }
 
 test "init_null" {
-    const status = lb.core.avl.init(null, 1024, 0);
+    const status = lb.core.Avl.init(null, 1024, 0);
     try expectEqual(status, @intFromEnum(lb.core.Status.error_object_is_null));
 }
 
 test "init_stack" {
-    var avl: lb.core.avl = undefined;
+    var avl: lb.core.Avl = undefined;
     const status = avl.init(1024, 0);
 
     try expectEqual(status, @intFromEnum(lb.core.Status.ok));
@@ -51,7 +51,7 @@ test "init_stack" {
 }
 
 test "init_args" {
-    var avl = zeroInit(lb.core.avl, .{});
+    var avl = zeroInit(lb.core.Avl, .{});
     const status = avl.init(0, 0);
 
     try expectEqual(status, @intFromEnum(lb.core.Status.error_wrong_args));
@@ -60,7 +60,7 @@ test "init_args" {
 }
 
 test "node_make" {
-    var avl: lb.core.avl = undefined;
+    var avl: lb.core.Avl = undefined;
     try expectEqual(avl.init(1024, 0), @intFromEnum(lb.core.Status.ok));
 
     const node = avl.nodeMake(1, &avl);
@@ -78,7 +78,7 @@ test "node_make" {
 }
 
 test "node_clean" {
-    var avl: lb.core.avl = undefined;
+    var avl: lb.core.Avl = undefined;
     try expectEqual(avl.init(1024, 0), @intFromEnum(lb.core.Status.ok));
 
     var node = avl.nodeMake(1, &avl);
@@ -105,7 +105,7 @@ test "node_clean" {
 }
 
 test "node_destroy" {
-    var avl = lb.core.avl.create().?;
+    var avl = lb.core.Avl.create().?;
     _ = avl.init(1024, 0);
 
     var node = avl.nodeMake(1, avl);
@@ -123,8 +123,8 @@ test "node_destroy" {
     _ = avl.destroy(true);
 }
 
-fn test_for_three(avl: *lb.core.avl, root: ?*lb.core.avlNode) !void {
-    var node: ?*lb.core.avlNode = undefined;
+fn test_for_three(avl: *lb.core.Avl, root: ?*lb.core.AvlNode) !void {
+    var node: ?*lb.core.AvlNode = undefined;
 
     try expect(root != null);
     try expectEqual(root.?.type, 2);
@@ -165,8 +165,8 @@ fn test_for_three(avl: *lb.core.avl, root: ?*lb.core.avlNode) !void {
 }
 
 test "three_3_0" {
-    var avl: lb.core.avl = undefined;
-    var root: ?*lb.core.avlNode = null;
+    var avl: lb.core.Avl = undefined;
+    var root: ?*lb.core.AvlNode = null;
 
     try expectEqual(avl.init(1024, 0), @intFromEnum(lb.core.Status.ok));
 
@@ -180,8 +180,8 @@ test "three_3_0" {
 }
 
 test "three_3_1" {
-    var avl: lb.core.avl = undefined;
-    var root: ?*lb.core.avlNode = null;
+    var avl: lb.core.Avl = undefined;
+    var root: ?*lb.core.AvlNode = null;
 
     try expectEqual(avl.init(1024, 0), @intFromEnum(lb.core.Status.ok));
 
@@ -195,8 +195,8 @@ test "three_3_1" {
 }
 
 test "three_3_2" {
-    var avl: lb.core.avl = undefined;
-    var root: ?*lb.core.avlNode = null;
+    var avl: lb.core.Avl = undefined;
+    var root: ?*lb.core.AvlNode = null;
 
     try expectEqual(avl.init(1024, 0), @intFromEnum(lb.core.Status.ok));
 
@@ -210,8 +210,8 @@ test "three_3_2" {
 }
 
 test "three_3_3" {
-    var avl: lb.core.avl = undefined;
-    var root: ?*lb.core.avlNode = null;
+    var avl: lb.core.Avl = undefined;
+    var root: ?*lb.core.AvlNode = null;
 
     try expectEqual(avl.init(1024, 0), @intFromEnum(lb.core.Status.ok));
 
@@ -225,8 +225,8 @@ test "three_3_3" {
 }
 
 test "three_3_4" {
-    var avl: lb.core.avl = undefined;
-    var root: ?*lb.core.avlNode = null;
+    var avl: lb.core.Avl = undefined;
+    var root: ?*lb.core.AvlNode = null;
 
     try expectEqual(avl.init(1024, 0), @intFromEnum(lb.core.Status.ok));
 
@@ -240,8 +240,8 @@ test "three_3_4" {
 }
 
 test "three_3_5" {
-    var avl: lb.core.avl = undefined;
-    var root: ?*lb.core.avlNode = null;
+    var avl: lb.core.Avl = undefined;
+    var root: ?*lb.core.AvlNode = null;
 
     try expectEqual(avl.init(1024, 0), @intFromEnum(lb.core.Status.ok));
 
@@ -255,9 +255,9 @@ test "three_3_5" {
 }
 
 test "tree_4" {
-    var avl: lb.core.avl = undefined;
-    var root: ?*lb.core.avlNode = null;
-    var node: ?*lb.core.avlNode = undefined;
+    var avl: lb.core.Avl = undefined;
+    var root: ?*lb.core.AvlNode = null;
+    var node: ?*lb.core.AvlNode = undefined;
 
     try expectEqual(avl.init(1024, 0), @intFromEnum(lb.core.Status.ok));
 
@@ -317,9 +317,9 @@ test "tree_4" {
 }
 
 test "tree_5" {
-    var avl: lb.core.avl = undefined;
-    var root: ?*lb.core.avlNode = null;
-    var node: ?*lb.core.avlNode = undefined;
+    var avl: lb.core.Avl = undefined;
+    var root: ?*lb.core.AvlNode = null;
+    var node: ?*lb.core.AvlNode = undefined;
 
     try expectEqual(avl.init(1024, 0), @intFromEnum(lb.core.Status.ok));
 
@@ -392,9 +392,9 @@ test "tree_5" {
 }
 
 test "delete_1L" {
-    var avl: lb.core.avl = undefined;
-    var root: ?*lb.core.avlNode = null;
-    var node: ?*lb.core.avlNode = undefined;
+    var avl: lb.core.Avl = undefined;
+    var root: ?*lb.core.AvlNode = null;
+    var node: ?*lb.core.AvlNode = undefined;
 
     try expectEqual(avl.init(1024, 0), @intFromEnum(lb.core.Status.ok));
 
@@ -446,9 +446,9 @@ test "delete_1L" {
 }
 
 test "delete_1R" {
-    var avl: lb.core.avl = undefined;
-    var root: ?*lb.core.avlNode = null;
-    var node: ?*lb.core.avlNode = undefined;
+    var avl: lb.core.Avl = undefined;
+    var root: ?*lb.core.AvlNode = null;
+    var node: ?*lb.core.AvlNode = undefined;
 
     try expectEqual(avl.init(1024, 0), @intFromEnum(lb.core.Status.ok));
 
@@ -500,9 +500,9 @@ test "delete_1R" {
 }
 
 test "delete_2L" {
-    var avl: lb.core.avl = undefined;
-    var root: ?*lb.core.avlNode = null;
-    var node: ?*lb.core.avlNode = undefined;
+    var avl: lb.core.Avl = undefined;
+    var root: ?*lb.core.AvlNode = null;
+    var node: ?*lb.core.AvlNode = undefined;
 
     try expectEqual(avl.init(1024, 0), @intFromEnum(lb.core.Status.ok));
 
@@ -554,9 +554,9 @@ test "delete_2L" {
 }
 
 test "delete_2R" {
-    var avl: lb.core.avl = undefined;
-    var root: ?*lb.core.avlNode = null;
-    var node: ?*lb.core.avlNode = undefined;
+    var avl: lb.core.Avl = undefined;
+    var root: ?*lb.core.AvlNode = null;
+    var node: ?*lb.core.AvlNode = undefined;
 
     try expectEqual(avl.init(1024, 0), @intFromEnum(lb.core.Status.ok));
 
@@ -608,9 +608,9 @@ test "delete_2R" {
 }
 
 test "delete_sub_1L" {
-    var avl: lb.core.avl = undefined;
-    var root: ?*lb.core.avlNode = null;
-    var node: ?*lb.core.avlNode = undefined;
+    var avl: lb.core.Avl = undefined;
+    var root: ?*lb.core.AvlNode = null;
+    var node: ?*lb.core.AvlNode = undefined;
 
     try expectEqual(avl.init(1024, 0), @intFromEnum(lb.core.Status.ok));
 
@@ -703,9 +703,9 @@ test "delete_sub_1L" {
 }
 
 test "delete_sub_1R" {
-    var avl: lb.core.avl = undefined;
-    var root: ?*lb.core.avlNode = null;
-    var node: ?*lb.core.avlNode = undefined;
+    var avl: lb.core.Avl = undefined;
+    var root: ?*lb.core.AvlNode = null;
+    var node: ?*lb.core.AvlNode = undefined;
 
     try expectEqual(avl.init(1024, 0), @intFromEnum(lb.core.Status.ok));
 
@@ -799,9 +799,9 @@ test "delete_sub_1R" {
 }
 
 test "delete_10_0" {
-    var avl: lb.core.avl = undefined;
-    var root: ?*lb.core.avlNode = null;
-    var node: ?*lb.core.avlNode = undefined;
+    var avl: lb.core.Avl = undefined;
+    var root: ?*lb.core.AvlNode = null;
+    var node: ?*lb.core.AvlNode = undefined;
 
     try expectEqual(avl.init(1024, 0), @intFromEnum(lb.core.Status.ok));
 
@@ -845,9 +845,9 @@ test "delete_10_0" {
 }
 
 test "delete_10_1" {
-    var avl: lb.core.avl = undefined;
-    var root: ?*lb.core.avlNode = null;
-    var node: ?*lb.core.avlNode = undefined;
+    var avl: lb.core.Avl = undefined;
+    var root: ?*lb.core.AvlNode = null;
+    var node: ?*lb.core.AvlNode = undefined;
 
     try expectEqual(avl.init(1024, 0), @intFromEnum(lb.core.Status.ok));
 
@@ -892,9 +892,9 @@ test "delete_10_1" {
 }
 
 test "delete_10_2" {
-    var avl: lb.core.avl = undefined;
-    var root: ?*lb.core.avlNode = null;
-    var node: ?*lb.core.avlNode = undefined;
+    var avl: lb.core.Avl = undefined;
+    var root: ?*lb.core.AvlNode = null;
+    var node: ?*lb.core.AvlNode = undefined;
 
     try expectEqual(avl.init(1024, 0), @intFromEnum(lb.core.Status.ok));
 
@@ -939,9 +939,9 @@ test "delete_10_2" {
 }
 
 test "delete_10_3" {
-    var avl: lb.core.avl = undefined;
-    var root: ?*lb.core.avlNode = null;
-    var node: ?*lb.core.avlNode = undefined;
+    var avl: lb.core.Avl = undefined;
+    var root: ?*lb.core.AvlNode = null;
+    var node: ?*lb.core.AvlNode = undefined;
 
     try expectEqual(avl.init(1024, 0), @intFromEnum(lb.core.Status.ok));
 
@@ -985,9 +985,9 @@ test "delete_10_3" {
 }
 
 test "delete_10_4" {
-    var avl: lb.core.avl = undefined;
-    var root: ?*lb.core.avlNode = null;
-    var node: ?*lb.core.avlNode = undefined;
+    var avl: lb.core.Avl = undefined;
+    var root: ?*lb.core.AvlNode = null;
+    var node: ?*lb.core.AvlNode = undefined;
 
     try expectEqual(avl.init(1024, 0), @intFromEnum(lb.core.Status.ok));
 
@@ -1031,9 +1031,9 @@ test "delete_10_4" {
 }
 
 test "delete_10_5" {
-    var avl: lb.core.avl = undefined;
-    var root: ?*lb.core.avlNode = null;
-    var node: ?*lb.core.avlNode = undefined;
+    var avl: lb.core.Avl = undefined;
+    var root: ?*lb.core.AvlNode = null;
+    var node: ?*lb.core.AvlNode = undefined;
 
     try expectEqual(avl.init(1024, 0), @intFromEnum(lb.core.Status.ok));
 
@@ -1077,7 +1077,7 @@ test "delete_10_5" {
 }
 
 test "clean" {
-    var avl: lb.core.avl = undefined;
+    var avl: lb.core.Avl = undefined;
     _ = avl.init(1024, 0);
 
     avl.clean();
@@ -1086,21 +1086,21 @@ test "clean" {
 }
 
 test "destroy" {
-    var avl = lb.core.avl.create().?;
+    var avl = lb.core.Avl.create().?;
     _ = avl.init(1024, 0);
 
     try expectEqual(avl.destroy(true), null);
 
-    avl = lb.core.avl.create().?;
+    avl = lb.core.Avl.create().?;
     _ = avl.init(1021, 0);
 
     try expectEqual(avl.destroy(false), avl);
     try expectEqual(avl.destroy(true), null);
-    try expectEqual(lb.core.avl.destroy(null, false), null);
+    try expectEqual(lb.core.Avl.destroy(null, false), null);
 }
 
 test "destroy_stack" {
-    var avl: lb.core.avl = undefined;
+    var avl: lb.core.Avl = undefined;
     _ = avl.init(1024, 0);
 
     try expectEqual(avl.destroy(false), &avl);
@@ -1108,9 +1108,9 @@ test "destroy_stack" {
 
 test "foreach_4" {
     var p: *usize = undefined;
-    var avl: lb.core.avl = undefined;
+    var avl: lb.core.Avl = undefined;
     var t: avlTestCtx = undefined;
-    var root: ?*lb.core.avlNode = null;
+    var root: ?*lb.core.AvlNode = null;
 
     try expectEqual(avl.init(1024, 0), @intFromEnum(lb.core.Status.ok));
 
@@ -1119,7 +1119,7 @@ test "foreach_4" {
         _ = avl.insert(&root, i, null);
     }
 
-    t.result = @ptrCast(@alignCast(lb.core.memory.malloc(10 * @sizeOf(usize))));
+    t.result = @ptrCast(@alignCast(lb.core.Memory.malloc(10 * @sizeOf(usize))));
     try expect(t.result != null);
 
     t.remove = 4;
@@ -1136,15 +1136,15 @@ test "foreach_4" {
         p = @ptrFromInt(@intFromPtr(p) + @sizeOf(usize));
     }
 
-    lb.core.memory.free(t.result);
+    lb.core.Memory.free(t.result);
     _ = avl.destroy(false);
 }
 
 test "foreach_6" {
     var p: *usize = undefined;
-    var avl: lb.core.avl = undefined;
+    var avl: lb.core.Avl = undefined;
     var t: avlTestCtx = undefined;
-    var root: ?*lb.core.avlNode = null;
+    var root: ?*lb.core.AvlNode = null;
 
     try expectEqual(avl.init(1024, 0), @intFromEnum(lb.core.Status.ok));
 
@@ -1152,7 +1152,7 @@ test "foreach_6" {
         _ = avl.insert(&root, i, null);
     }
 
-    t.result = @ptrCast(@alignCast(lb.core.memory.malloc(10 * @sizeOf(usize))));
+    t.result = @ptrCast(@alignCast(lb.core.Memory.malloc(10 * @sizeOf(usize))));
     try expect(t.result != null);
 
     t.remove = 6;
@@ -1168,19 +1168,19 @@ test "foreach_6" {
         p = @ptrFromInt(@intFromPtr(p) + @sizeOf(usize));
     }
 
-    lb.core.memory.free(t.result);
+    lb.core.Memory.free(t.result);
     _ = avl.destroy(false);
 }
 
 test "foreach_10" {
     var p: *usize = undefined;
-    var avl: lb.core.avl = undefined;
+    var avl: lb.core.Avl = undefined;
     var t: avlTestCtx = undefined;
-    var root: ?*lb.core.avlNode = undefined;
+    var root: ?*lb.core.AvlNode = undefined;
 
     const total: usize = 101;
 
-    t.result = @ptrCast(@alignCast(lb.core.memory.malloc(total * @sizeOf(usize))));
+    t.result = @ptrCast(@alignCast(lb.core.Memory.malloc(total * @sizeOf(usize))));
     try expect(t.result != null);
 
     for (1..total) |r| {
@@ -1210,5 +1210,5 @@ test "foreach_10" {
         _ = avl.destroy(false);
     }
 
-    lb.core.memory.free(t.result);
+    lb.core.Memory.free(t.result);
 }
