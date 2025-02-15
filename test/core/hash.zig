@@ -4,20 +4,25 @@ const expectEqual = std.testing.expectEqual;
 
 const lb = @import("lexbor");
 
-// test "init" {
-//     var array = lb.core.Array.create().?;
-//     const status = array.init(32);
-//
-//     try expectEqual(status, @intFromEnum(lb.core.Status.ok));
-//
-//     _ = array.destroy(true);
-// }
-//
-// test "init_null" {
-//     const status = lb.core.Array.init(null, 32);
-//     try expectEqual(status, @intFromEnum(lb.core.Status.error_object_is_null));
-// }
-//
+const HashEntry = struct {
+    entry: lb.core.HashEntry,
+    hash: lb.core.Hash,
+    value: usize,
+};
+
+test "init" {
+    var hash = lb.core.Hash.create().?;
+    const status = hash.init(1024, @sizeOf(HashEntry));
+    try expectEqual(status, @intFromEnum(lb.core.Status.ok));
+
+    _ = hash.destroy(true);
+}
+
+test "init_null" {
+    const status = lb.core.Hash.init(null, 1024, @sizeOf(HashEntry));
+    try expectEqual(status, @intFromEnum(lb.core.Status.error_object_is_null));
+}
+
 // test "init_stack" {
 //     var array: lb.core.Array = undefined;
 //     const status = array.init(32);

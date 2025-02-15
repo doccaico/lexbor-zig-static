@@ -5,7 +5,7 @@ const zeroInit = std.mem.zeroInit;
 
 const lb = @import("lexbor");
 
-pub const avlTestCtx = struct {
+pub const AvlTestCtx = struct {
     remove: usize,
     result: ?*usize,
     p: ?*usize,
@@ -14,13 +14,13 @@ pub const avlTestCtx = struct {
 fn avl_cb(avl: ?*lb.core.Avl, root: ?*?*lb.core.AvlNode, node: ?*lb.core.AvlNode, ctx: ?*anyopaque) callconv(.C) lb.core.status {
     const t = ctx;
 
-    @as(*avlTestCtx, @ptrCast(@alignCast(t.?))).p.?.* = node.?.type;
+    @as(*AvlTestCtx, @ptrCast(@alignCast(t.?))).p.?.* = node.?.type;
 
-    const pointer_address = @intFromPtr(@as(*avlTestCtx, @ptrCast(@alignCast(t.?))).p.?);
+    const pointer_address = @intFromPtr(@as(*AvlTestCtx, @ptrCast(@alignCast(t.?))).p.?);
 
-    @as(*avlTestCtx, @ptrCast(@alignCast(t.?))).p.? = @ptrFromInt(pointer_address + @sizeOf(usize));
+    @as(*AvlTestCtx, @ptrCast(@alignCast(t.?))).p.? = @ptrFromInt(pointer_address + @sizeOf(usize));
 
-    if (node.?.type == @as(*avlTestCtx, @ptrCast(@alignCast(t.?))).remove) {
+    if (node.?.type == @as(*AvlTestCtx, @ptrCast(@alignCast(t.?))).remove) {
         avl.?.removeByNode(root, node);
     }
 
@@ -1109,7 +1109,7 @@ test "destroy_stack" {
 test "foreach_4" {
     var p: *usize = undefined;
     var avl: lb.core.Avl = undefined;
-    var t: avlTestCtx = undefined;
+    var t: AvlTestCtx = undefined;
     var root: ?*lb.core.AvlNode = null;
 
     try expectEqual(avl.init(1024, 0), @intFromEnum(lb.core.Status.ok));
@@ -1143,7 +1143,7 @@ test "foreach_4" {
 test "foreach_6" {
     var p: *usize = undefined;
     var avl: lb.core.Avl = undefined;
-    var t: avlTestCtx = undefined;
+    var t: AvlTestCtx = undefined;
     var root: ?*lb.core.AvlNode = null;
 
     try expectEqual(avl.init(1024, 0), @intFromEnum(lb.core.Status.ok));
@@ -1175,7 +1175,7 @@ test "foreach_6" {
 test "foreach_10" {
     var p: *usize = undefined;
     var avl: lb.core.Avl = undefined;
-    var t: avlTestCtx = undefined;
+    var t: AvlTestCtx = undefined;
     var root: ?*lb.core.AvlNode = undefined;
 
     const total: usize = 101;

@@ -6,7 +6,7 @@ const zeroInit = std.mem.zeroInit;
 
 const lb = @import("lexbor");
 
-pub const t = struct {
+pub const TestData = struct {
     a: usize,
     b: c_char,
     c: c_int,
@@ -14,7 +14,7 @@ pub const t = struct {
 
 test "init" {
     var dobj = lb.core.Dobject.create().?;
-    const status = dobj.init(128, @sizeOf(t));
+    const status = dobj.init(128, @sizeOf(TestData));
 
     try expectEqual(status, @intFromEnum(lb.core.Status.ok));
 
@@ -23,7 +23,7 @@ test "init" {
 
 test "init_stack" {
     var dobj: lb.core.Dobject = undefined;
-    const status = dobj.init(128, @sizeOf(t));
+    const status = dobj.init(128, @sizeOf(TestData));
 
     try expectEqual(status, @intFromEnum(lb.core.Status.ok));
 
@@ -34,7 +34,7 @@ test "init_args" {
     var dobj = zeroInit(lb.core.Dobject, .{});
     var status: lb.core.status = undefined;
 
-    status = dobj.init(0, @sizeOf(t));
+    status = dobj.init(0, @sizeOf(TestData));
     try expectEqual(status, @intFromEnum(lb.core.Status.error_wrong_args));
 
     status = dobj.init(128, 0);
@@ -48,7 +48,7 @@ test "init_args" {
 
 test "obj_alloc" {
     var dobj: lb.core.Dobject = undefined;
-    _ = dobj.init(128, @sizeOf(t));
+    _ = dobj.init(128, @sizeOf(TestData));
 
     const data = dobj.alloc();
 
@@ -60,13 +60,13 @@ test "obj_alloc" {
 
 test "obj_calloc" {
     var dobj: lb.core.Dobject = undefined;
-    _ = dobj.init(128, @sizeOf(t));
+    _ = dobj.init(128, @sizeOf(TestData));
 
     const data = dobj.calloc();
 
-    try expectEqual(@as(*t, @ptrCast(@alignCast(data.?))).a, 0);
-    try expectEqual(@as(*t, @ptrCast(@alignCast(data.?))).b, 0x00);
-    try expectEqual(@as(*t, @ptrCast(@alignCast(data.?))).c, 0);
+    try expectEqual(@as(*TestData, @ptrCast(@alignCast(data.?))).a, 0);
+    try expectEqual(@as(*TestData, @ptrCast(@alignCast(data.?))).b, 0x00);
+    try expectEqual(@as(*TestData, @ptrCast(@alignCast(data.?))).c, 0);
 
     _ = dobj.destroy(false);
 }
@@ -75,7 +75,7 @@ test "obj_mem_chunk" {
     const count: usize = 128;
 
     var dobj: lb.core.Dobject = undefined;
-    _ = dobj.init(count, @sizeOf(t));
+    _ = dobj.init(count, @sizeOf(TestData));
 
     for (0..count) |_| {
         _ = dobj.alloc();
@@ -88,13 +88,13 @@ test "obj_mem_chunk" {
 
 test "obj_alloc_free_alloc" {
     var dobj: lb.core.Dobject = undefined;
-    _ = dobj.init(128, @sizeOf(t));
+    _ = dobj.init(128, @sizeOf(TestData));
 
     var data = dobj.alloc();
 
-    @as(*t, @ptrCast(@alignCast(data.?))).a = 159753;
-    @as(*t, @ptrCast(@alignCast(data.?))).b = 'L';
-    @as(*t, @ptrCast(@alignCast(data.?))).c = 12;
+    @as(*TestData, @ptrCast(@alignCast(data.?))).a = 159753;
+    @as(*TestData, @ptrCast(@alignCast(data.?))).b = 'L';
+    @as(*TestData, @ptrCast(@alignCast(data.?))).c = 12;
 
     _ = dobj.free(data);
 
@@ -103,9 +103,9 @@ test "obj_alloc_free_alloc" {
 
     data = dobj.alloc();
 
-    try expectEqual(@as(*t, @ptrCast(@alignCast(data.?))).a, 159753);
-    try expectEqual(@as(*t, @ptrCast(@alignCast(data.?))).b, 'L');
-    try expectEqual(@as(*t, @ptrCast(@alignCast(data.?))).c, 12);
+    try expectEqual(@as(*TestData, @ptrCast(@alignCast(data.?))).a, 159753);
+    try expectEqual(@as(*TestData, @ptrCast(@alignCast(data.?))).b, 'L');
+    try expectEqual(@as(*TestData, @ptrCast(@alignCast(data.?))).c, 12);
 
     _ = dobj.destroy(false);
 }
@@ -113,14 +113,14 @@ test "obj_alloc_free_alloc" {
 test "obj_cache" {
     var dobj: lb.core.Dobject = undefined;
 
-    var data: [100]t = undefined;
+    var data: [100]TestData = undefined;
 
     const data_size = data.len;
 
-    _ = dobj.init(128, @sizeOf(t));
+    _ = dobj.init(128, @sizeOf(TestData));
 
     for (0..data_size) |i| {
-        data[i] = @as(*t, @ptrCast(@alignCast(dobj.alloc().?))).*;
+        data[i] = @as(*TestData, @ptrCast(@alignCast(dobj.alloc().?))).*;
         try expectEqual(dobj.allocated, i + 1);
     }
 
@@ -136,20 +136,20 @@ test "obj_cache" {
 }
 
 test "absolute_position" {
-    var data: *t = undefined;
+    var data: *TestData = undefined;
     var dobj: lb.core.Dobject = undefined;
 
-    _ = dobj.init(128, @sizeOf(t));
+    _ = dobj.init(128, @sizeOf(TestData));
 
     for (0..100) |i| {
-        data = @as(*t, @ptrCast(@alignCast(dobj.alloc().?)));
+        data = @as(*TestData, @ptrCast(@alignCast(dobj.alloc().?)));
 
         data.a = i;
         data.b = @intCast(i);
         data.c = @intCast(i + 5);
     }
 
-    data = @as(*t, @ptrCast(@alignCast(dobj.byAbsolutePosition(34).?)));
+    data = @as(*TestData, @ptrCast(@alignCast(dobj.byAbsolutePosition(34).?)));
 
     try expectEqual(data.a, 34);
     try expectEqual(data.b, 34);
@@ -159,20 +159,20 @@ test "absolute_position" {
 }
 
 test "absolute_position_up" {
-    var data: *t = undefined;
+    var data: *TestData = undefined;
     var dobj: lb.core.Dobject = undefined;
 
-    _ = dobj.init(27, @sizeOf(t));
+    _ = dobj.init(27, @sizeOf(TestData));
 
     for (0..213) |i| {
-        data = @as(*t, @ptrCast(@alignCast(dobj.alloc().?)));
+        data = @as(*TestData, @ptrCast(@alignCast(dobj.alloc().?)));
 
         data.a = i;
         data.b = @truncate(@as(c_int, @intCast(i)));
         data.c = @intCast(i + 5);
     }
 
-    data = @as(*t, @ptrCast(@alignCast(dobj.byAbsolutePosition(121).?)));
+    data = @as(*TestData, @ptrCast(@alignCast(dobj.byAbsolutePosition(121).?)));
 
     try expectEqual(data.a, 121);
     try expectEqual(data.b, 121);
@@ -182,20 +182,20 @@ test "absolute_position_up" {
 }
 
 test "absolute_position_edge" {
-    var data: *t = undefined;
+    var data: *TestData = undefined;
     var dobj: lb.core.Dobject = undefined;
 
-    _ = dobj.init(128, @sizeOf(t));
+    _ = dobj.init(128, @sizeOf(TestData));
 
     for (0..256) |i| {
-        data = @as(*t, @ptrCast(@alignCast(dobj.alloc().?)));
+        data = @as(*TestData, @ptrCast(@alignCast(dobj.alloc().?)));
 
         data.a = i;
         data.b = @truncate(@as(c_int, @intCast(i)));
         data.c = @intCast(i + 5);
     }
 
-    data = @as(*t, @ptrCast(@alignCast(dobj.byAbsolutePosition(128).?)));
+    data = @as(*TestData, @ptrCast(@alignCast(dobj.byAbsolutePosition(128).?)));
 
     try expectEqual(data.a, 128);
     try expectEqual(data.b, @as(c_char, @truncate(@as(c_int, @intCast(128)))));
@@ -206,9 +206,9 @@ test "absolute_position_edge" {
 
 test "obj_free" {
     var dobj: lb.core.Dobject = undefined;
-    _ = dobj.init(128, @sizeOf(t));
+    _ = dobj.init(128, @sizeOf(TestData));
 
-    const data = @as(*t, @ptrCast(@alignCast(dobj.alloc().?)));
+    const data = @as(?*TestData, @ptrCast(@alignCast(dobj.alloc().?)));
     _ = dobj.free(data);
 
     try expectEqual(dobj.allocated, 0);
@@ -219,9 +219,9 @@ test "obj_free" {
 
 test "clean" {
     var dobj: lb.core.Dobject = undefined;
-    _ = dobj.init(128, @sizeOf(t));
+    _ = dobj.init(128, @sizeOf(TestData));
 
-    const data = @as(?*t, @ptrCast(@alignCast(dobj.alloc().?)));
+    const data = @as(?*TestData, @ptrCast(@alignCast(dobj.alloc().?)));
     try expect(data != null);
 
     dobj.clean();
@@ -233,12 +233,12 @@ test "clean" {
 
 test "destroy" {
     var dobj = lb.core.Dobject.create().?;
-    _ = dobj.init(128, @sizeOf(t));
+    _ = dobj.init(128, @sizeOf(TestData));
 
     try expectEqual(dobj.destroy(true), null);
 
     dobj = lb.core.Dobject.create().?;
-    _ = dobj.init(128, @sizeOf(t));
+    _ = dobj.init(128, @sizeOf(TestData));
 
     try expectEqual(dobj.destroy(false), dobj);
     try expectEqual(dobj.destroy(true), null);
@@ -247,7 +247,7 @@ test "destroy" {
 
 test "destroy_stack" {
     var dobj = lb.core.Dobject.create().?;
-    _ = dobj.init(128, @sizeOf(t));
+    _ = dobj.init(128, @sizeOf(TestData));
 
     try expectEqual(dobj.destroy(false), dobj);
 }

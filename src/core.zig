@@ -941,14 +941,14 @@ extern fn lexbor_hash_copy(hash: ?*Hash, entry: ?*HashEntry, key: ?*const char, 
 extern fn lexbor_hash_copy_lower(hash: ?*Hash, entry: ?*HashEntry, key: ?*const char, length: usize) status;
 extern fn lexbor_hash_copy_upper(hash: ?*Hash, entry: ?*HashEntry, key: ?*const char, length: usize) status;
 
-pub inline fn hashStr(entry: ?*HashEntry) ?*char {
+pub inline fn hashEntryStr(entry: ?*HashEntry) ?*char {
     if (entry.?.length <= HASH_SHORT_SIZE) {
         return entry.?.u.short_str;
     }
     return entry.?.u.long_str;
 }
 
-pub inline fn hashStrSet(entry: ?*HashEntry, data: ?*char, length: usize) ?*char {
+pub inline fn hashEntryStrSet(entry: ?*HashEntry, data: ?*char, length: usize) ?*char {
     entry.?.length = length;
 
     if (length <= HASH_SHORT_SIZE) {
@@ -958,6 +958,26 @@ pub inline fn hashStrSet(entry: ?*HashEntry, data: ?*char, length: usize) ?*char
 
     entry.?.u.long_str = data;
     return entry.?.u.long_str;
+}
+
+pub inline fn hashEntryStrFree(hash: ?*Hash, entry: ?*HashEntry) void {
+    if (entry.?.length > HASH_SHORT_SIZE) {
+        lexbor_mraw_free(hash.?.mraw, entry.?.u.long_str);
+    }
+
+    entry.?.length = 0;
+}
+
+pub inline fn hashEntryCreate(hash: ?*Hash) ?*HashEntry {
+    return @as(?*HashEntry, @ptrCast(@alignCast(lexbor_dobject_calloc(hash.?.entries))));
+}
+
+pub inline fn hashEntryDestroy(hash: ?*Hash, entry: ?*HashEntry) ?*HashEntry {
+    return @as(?*HashEntry, @ptrCast(@alignCast(lexbor_dobject_free(hash.?.entries, @as(?*anyopaque, @ptrCast(entry))))));
+}
+
+pub inline fn hashEntryCount(hash: ?*Hash) usize {
+    return dobjectAllocated(hash.?.entries);
 }
 
 // core/mem.h
@@ -1022,7 +1042,13 @@ pub const callbackF = ?*const fn (buffer: ?*char, size: usize, ctx: ?*anyopaque)
 
 // core/mraw.h
 
-pub const Mraw = extern struct { mem: ?*Mem, cache: ?*Bst, ref_count: usize };
+pub const Mraw = extern struct {
+    mem: ?*Mem,
+    cache: ?*Bst,
+    ref_count: usize,
+};
+
+extern fn lexbor_mraw_free(mraw: ?*Mraw, data: ?*anyopaque) ?*anyopaque;
 
 // core/str.h
 
