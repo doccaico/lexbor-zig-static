@@ -54,18 +54,6 @@ pub const Array = extern struct {
     pub fn delete(self: ?*Array, begin: usize, length: usize) void {
         return lexbor_array_delete(self, begin, length);
     }
-
-    pub fn getNoi(self: ?*Array, idx: usize) ?*anyopaque {
-        return lexbor_array_get_noi(self, idx);
-    }
-
-    pub fn lengthNoi(self: ?*Array) usize {
-        return lexbor_array_length_noi(self);
-    }
-
-    pub fn sizeNoi(self: ?*Array) usize {
-        return lexbor_array_size_noi(self);
-    }
 };
 
 extern fn lexbor_array_create() ?*Array;
@@ -745,14 +733,6 @@ pub const Dobject = extern struct {
     pub fn byAbsolutePosition(self: ?*Dobject, pos: usize) ?*anyopaque {
         return lexbor_dobject_by_absolute_position(self, pos);
     }
-
-    pub fn allocatedNoi(self: ?*Dobject) usize {
-        return lexbor_dobject_allocated_noi(self);
-    }
-
-    pub fn cacheLengthNoi(self: ?*Dobject) usize {
-        return lexbor_dobject_cache_length_noi(self);
-    }
 };
 
 extern fn lexbor_dobject_create() ?*Dobject;
@@ -1106,6 +1086,41 @@ pub inline fn inSegment(node: ?*const InNode, data: ?*const char) bool {
     return @intFromPtr(&node.?.begin.?[0]) <= @intFromPtr(&data[0]) and @intFromPtr(&node.?.end.?[0]) >= @intFromPtr(&data[0]);
 }
 
+// core/lexbor.h
+
+pub const memoryMallocF = ?*const fn (size: usize) callconv(.C) ?*anyopaque;
+pub const memoryReallocF = ?*const fn (dst: ?*anyopaque, size: usize) callconv(.C) ?*anyopaque;
+pub const memoryCallocF = ?*const fn (num: usize, size: usize) callconv(.C) ?*anyopaque;
+pub const memoryFreeF = ?*const fn (dst: ?*anyopaque) callconv(.C) void;
+
+pub const Memory = struct {
+    pub fn malloc(size: usize) ?*anyopaque {
+        return lexbor_malloc(size);
+    }
+
+    pub fn realloc(dst: ?*anyopaque, size: usize) ?*anyopaque {
+        return lexbor_realloc(dst, size);
+    }
+
+    pub fn calloc(num: usize, size: usize) ?*anyopaque {
+        return lexbor_calloc(num, size);
+    }
+
+    pub fn free(dst: ?*anyopaque) void {
+        lexbor_free(dst);
+    }
+
+    pub fn setup(new_malloc: memoryMallocF, new_realloc: memoryReallocF, new_calloc: memoryCallocF, new_free: memoryFreeF) void {
+        lexbor_memory_setup(new_malloc, new_realloc, new_calloc, new_free);
+    }
+};
+
+extern fn lexbor_malloc(size: usize) ?*anyopaque;
+extern fn lexbor_realloc(dst: *anyopaque, size: usize) ?*anyopaque;
+extern fn lexbor_calloc(num: usize, size: usize) ?*anyopaque;
+extern fn lexbor_free(dst: ?*anyopaque) void;
+extern fn lexbor_memory_setup(new_malloc: memoryMallocF, new_realloc: memoryReallocF, new_calloc: memoryCallocF, new_free: memoryFreeF) void;
+
 // core/mem.h
 
 pub const MemChunk = extern struct {
@@ -1193,43 +1208,6 @@ pub inline fn memAlign(size: usize) usize {
 pub inline fn memAlignFloor(size: usize) usize {
     return if ((size % MEM_ALIGN_STEP) != 0) size - (size % MEM_ALIGN_STEP) else size;
 }
-
-// core/lexbor.h
-
-pub const memoryMallocF = ?*const fn (size: usize) callconv(.C) ?*anyopaque;
-pub const memoryReallocF = ?*const fn (dst: ?*anyopaque, size: usize) callconv(.C) ?*anyopaque;
-pub const memoryCallocF = ?*const fn (num: usize, size: usize) callconv(.C) ?*anyopaque;
-pub const memoryFreeF = ?*const fn (dst: ?*anyopaque) callconv(.C) void;
-
-pub const Memory = struct {
-    pub fn malloc(size: usize) ?*anyopaque {
-        return lexbor_malloc(size);
-    }
-
-    pub fn realloc(dst: ?*anyopaque, size: usize) ?*anyopaque {
-        return lexbor_realloc(dst, size);
-    }
-
-    pub fn calloc(num: usize, size: usize) ?*anyopaque {
-        return lexbor_calloc(num, size);
-    }
-
-    pub fn free(dst: ?*anyopaque) void {
-        lexbor_free(dst);
-    }
-
-    pub fn setup(new_malloc: memoryMallocF, new_realloc: memoryReallocF, new_calloc: memoryCallocF, new_free: memoryFreeF) void {
-        lexbor_memory_setup(new_malloc, new_realloc, new_calloc, new_free);
-    }
-};
-
-extern fn lexbor_malloc(size: usize) ?*anyopaque;
-extern fn lexbor_realloc(dst: *anyopaque, size: usize) ?*anyopaque;
-extern fn lexbor_calloc(num: usize, size: usize) ?*anyopaque;
-extern fn lexbor_free(dst: ?*anyopaque) void;
-extern fn lexbor_memory_setup(new_malloc: memoryMallocF, new_realloc: memoryReallocF, new_calloc: memoryCallocF, new_free: memoryFreeF) void;
-
-// core/mem.h
 
 // core/types.h
 
