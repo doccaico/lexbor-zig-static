@@ -1268,11 +1268,11 @@ extern fn lexbor_mraw_data_size_set_noi(data: ?*anyopaque, size: usize) void;
 extern fn lexbor_mraw_dup_noi(mraw: ?*Mraw, src: ?*const anyopaque, size: usize) ?*anyopaque;
 
 pub inline fn mrawDataSize(data: ?*anyopaque) usize {
-    return @as(*usize, @ptrFromInt(@intFromPtr(@as(*u8, @ptrCast(@alignCast(data.?)))) - mraw_meta_size)).*;
+    return @as(*usize, @ptrFromInt(@intFromPtr(@as(*u8, @ptrCast(data.?))) - mraw_meta_size)).*;
 }
 
 pub inline fn mrawDataSizeSet(data: ?*anyopaque, size: usize) void {
-    const dest: ?*anyopaque = @ptrFromInt(@intFromPtr(@as(*u8, @ptrCast(@alignCast(data.?)))) - mraw_meta_size);
+    const dest: ?*anyopaque = @ptrFromInt(@intFromPtr(@as(*u8, @ptrCast(data.?))) - mraw_meta_size);
     memcpy(dest, @ptrFromInt(&size), @sizeOf(usize));
 }
 
