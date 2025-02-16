@@ -1350,6 +1350,33 @@ extern fn lexbor_printf_size(format: ?[*:0]const c_char, ...) usize;
 extern fn lexbor_sprintf_size(dst: ?*char, size: usize, format: ?[*:0]const c_char, ...) usize;
 // extern fn lexbor_vsprintf_size() usize;
 
+// core/sbst.h
+
+pub const SbstEntryStatic = extern struct {
+    key: ?*char,
+    value: ?*anyopaque,
+    value_len: usize,
+    left: usize,
+    right: usize,
+    next: usize,
+};
+
+pub inline fn sbstEntryStatic(strt: ?*const SbstEntryStatic, root: ?*const SbstEntryStatic, key: char) ?*sbstEntryStatic {
+    while (root != strt) {
+        if (root.?.key == key) {
+            return root;
+        } else if (@intFromPtr(key) > @intFromPtr(root.?.key)) {
+            root = &strt[root.?.right];
+        } else {
+            root = &strt[root.?.left];
+        }
+    }
+
+    return null;
+}
+
+// core/serialize.h
+
 // core/types.h
 
 pub const codepoint = u32;
