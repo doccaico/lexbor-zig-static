@@ -1382,6 +1382,45 @@ pub inline fn sbstEntryStatic(strt: ?*const SbstEntryStatic, root: ?*const SbstE
 extern fn lexbor_serialize_length_cb(data: ?*const char, length: usize, ctx: ?*anyopaque) status;
 extern fn lexbor_serialize_copy_cb(data: ?*const char, length: usize, ctx: ?*anyopaque) status;
 
+// core/shs.h
+
+pub const ShsEntry = extern struct {
+    key: ?*char,
+    value: ?*anyopaque,
+    key_len: usize,
+    next: usize,
+};
+
+pub const ShsHash = extern struct {
+    key: u32,
+    value: ?*anyopaque,
+    next: usize,
+};
+
+extern fn lexbor_shs_entry_get_static(tree: ?*const ShsEntry, key: ?*const char, size: usize) ?*ShsEntry;
+extern fn lexbor_shs_entry_get_lower_static(root: ?*const ShsEntry, key: ?*const char, key_len: usize) ?*ShsEntry;
+extern fn lexbor_shs_entry_get_upper_static(root: ?*const ShsEntry, key: ?*const char, key_len: usize) ?*ShsEntry;
+
+pub inline fn shsHashGetStatic(table: ?[*]const ShsHash, table_size: usize, key: u32) ?*ShsHash {
+    var entry = &table[(key % table_size) + 1];
+
+    while (true) {
+        if (entry.?.key == key) {
+            return entry;
+        }
+
+        entry = &table[entry.?.next];
+
+        if (entry != table) break;
+    }
+
+    return null;
+}
+
+// core/str.h
+
+// #define lexbor_str_check_size_arg_m(str, size, mraw, plus_len, return_fail)
+
 // core/types.h
 
 pub const codepoint = u32;
