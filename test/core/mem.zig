@@ -155,3 +155,118 @@ test "destroy" {
     try expectEqual(mem.destroy(true), null);
     try expectEqual(lb.core.Mem.destroy(null, false), null);
 }
+
+test "destroy_stack" {
+    var mem: lb.core.Mem = undefined;
+    _ = mem.init(1023);
+
+    try expectEqual(mem.destroy(false), &mem);
+}
+
+test "chunk_init" {
+    var chunk: lb.core.MemChunk = undefined;
+
+    var mem = lb.core.Mem.create().?;
+    _ = mem.init(1024);
+
+    const chunk_data = mem.chunkInit(&chunk, 0);
+    try expect(chunk_data != null);
+
+    try expect(chunk.data != null);
+    try expectEqual(chunk.length, 0);
+    try expectEqual(chunk.size, mem.chunk_min_size);
+
+    _ = mem.chunkDestroy(&chunk, false);
+    _ = mem.destroy(true);
+}
+
+test "chunk_init_overflow" {
+    var chunk: lb.core.MemChunk = undefined;
+
+    var mem = lb.core.Mem.create().?;
+    _ = mem.init(1024);
+
+    const chunk_data = mem.chunkInit(&chunk, 2049);
+    try expect(chunk_data != null);
+
+    try expect(chunk.data != null);
+    try expectEqual(chunk.length, 0);
+    try expectEqual(chunk.size, lb.core.memAlign(2049) + lb.core.memAlign(1024));
+
+    _ = mem.chunkDestroy(&chunk, false);
+    _ = mem.destroy(true);
+}
+
+test "chunk_make" {
+    var mem = lb.core.Mem.create().?;
+    _ = mem.init(1024);
+
+    const chunk = mem.chunkMake(0);
+    try expect(chunk != null);
+
+    try expect(chunk.?.data != null);
+    try expectEqual(chunk.?.length, 0);
+    try expectEqual(chunk.?.size, mem.chunk_min_size);
+
+    _ = mem.chunkDestroy(chunk, true);
+    _ = mem.destroy(true);
+}
+
+test "chunk_make_overflow" {
+    var mem = lb.core.Mem.create().?;
+    _ = mem.init(1024);
+
+    const chunk = mem.chunkMake(2049);
+    try expect(chunk != null);
+
+    try expect(chunk.?.data != null);
+    try expectEqual(chunk.?.length, 0);
+    try expectEqual(chunk.?.size, lb.core.memAlign(2049) + lb.core.memAlign(1024));
+
+    _ = mem.chunkDestroy(chunk, true);
+    _ = mem.destroy(true);
+}
+
+test "chunk_destroy" {
+    var chunk: ?*lb.core.MemChunk = undefined;
+    var chunk_null: ?*lb.core.MemChunk = undefined;
+
+    var mem = lb.core.Mem.create().?;
+    _ = mem.init(1024);
+
+    chunk = mem.chunkMake(0);
+    chunk = mem.chunkDestroy(chunk, true);
+
+    try expectEqual(chunk, null);
+
+    chunk = mem.chunkMake(0);
+    chunk = mem.chunkDestroy(chunk, false);
+
+    try expect(chunk != null);
+    try expectEqual(chunk.?.data, null);
+
+    chunk = mem.chunkDestroy(chunk, true);
+
+    chunk = mem.chunkMake(0);
+    try expect(chunk != null);
+
+    chunk_null = lb.core.Mem.chunkDestroy(null, chunk, false);
+    try expectEqual(chunk_null, null);
+
+    chunk = mem.chunkDestroy(chunk, true);
+    try expectEqual(chunk, null);
+
+    chunk = mem.chunkDestroy(null, false);
+    try expectEqual(chunk, null);
+
+    chunk = mem.chunkDestroy(chunk, true);
+    try expectEqual(chunk, null);
+
+    chunk = mem.chunkDestroy(null, false);
+    try expectEqual(chunk, null);
+
+    chunk = lb.core.Mem.chunkDestroy(null, null, false);
+    try expectEqual(chunk, null);
+
+    _ = mem.destroy(true);
+}
