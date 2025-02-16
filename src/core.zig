@@ -1377,6 +1377,11 @@ pub inline fn sbstEntryStatic(strt: ?*const SbstEntryStatic, root: ?*const SbstE
 
 // core/serialize.h
 
+// #define lexbor_serialize_write(cb, data, length, ctx, status)
+
+extern fn lexbor_serialize_length_cb(data: ?*const char, length: usize, ctx: ?*anyopaque) status;
+extern fn lexbor_serialize_copy_cb(data: ?*const char, length: usize, ctx: ?*anyopaque) status;
+
 // core/types.h
 
 pub const codepoint = u32;
