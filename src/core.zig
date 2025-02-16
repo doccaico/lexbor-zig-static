@@ -1345,6 +1345,11 @@ pub inline fn plogLength(plog: ?*Plog) usize {
 
 // core/print.h
 
+extern fn lexbor_printf_size(format: ?[*:0]const c_char, ...) usize;
+// extern fn lexbor_vprintf_size() usize;
+extern fn lexbor_sprintf_size(dst: ?*char, size: usize, format: ?[*:0]const c_char, ...) usize;
+// extern fn lexbor_vsprintf_size() usize;
+
 // core/types.h
 
 pub const codepoint = u32;
