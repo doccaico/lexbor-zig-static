@@ -163,15 +163,15 @@ pub inline fn arrayObjGet(array: ?*ArrayObj, idx: usize) ?*anyopaque {
     return array.?.list.? + (idx * array.?.struct_size);
 }
 
-pub inline fn arrayObjLength(array: ?*ArrayObj) void {
+pub inline fn arrayObjLength(array: ?*ArrayObj) usize {
     return array.?.length;
 }
 
-pub inline fn arrayObjSize(array: ?*ArrayObj) void {
+pub inline fn arrayObjSize(array: ?*ArrayObj) usize {
     return array.?.size;
 }
 
-pub inline fn arrayObjStructSize(array: ?*ArrayObj) void {
+pub inline fn arrayObjStructSize(array: ?*ArrayObj) usize {
     return array.?.struct_size;
 }
 
@@ -1298,6 +1298,52 @@ extern fn lexbor_perf_end(perf: ?*anyopaque) status;
 extern fn lexbor_perf_in_sec(perf: ?*anyopaque) f64;
 
 // core/plog.h
+
+pub const PlogEntry = extern struct {
+    data: ?[*]char,
+    context: ?*anyopaque,
+    id: c_uint,
+};
+
+pub const Plog = extern struct {
+    list: ArrayObj,
+};
+
+extern fn lexbor_plog_init(plog: ?*Plog, init_size: usize, struct_size: usize) status;
+extern fn lexbor_plog_destroy(plog: ?*Plog, self_destroy: bool) ?*Plog;
+extern fn lexbor_plog_create_noi() ?*Plog;
+extern fn lexbor_plog_clean_noi(plog: ?*Plog) void;
+extern fn lexbor_plog_push_noi(plog: ?*Plog, data: ?*const char, ctx: ?*anyopaque, id: c_uint) ?*anyopaque;
+extern fn lexbor_plog_length_noi(plog: ?*Plog) usize;
+
+pub inline fn plogCreate() ?*Plog {
+    return @as(?*Plog, @ptrCast(@alignCast(lexbor_calloc(1, @sizeOf(Plog)))));
+}
+
+pub inline fn plogClean(plog: ?*Plog) void {
+    lexbor_array_obj_clean(&plog.?.list);
+}
+
+pub inline fn plogPush(plog: ?*Plog, data: ?*const char, ctx: ?*anyopaque, id: c_uint) ?*anyopaque {
+    var entry: ?*PlogEntry = undefined;
+
+    if (plog == null) return null;
+
+    entry = @ptrCast(@alignCast(lexbor_array_obj_push(&plog.?.list)));
+    if (entry == null) return null;
+
+    entry.?.data = data;
+    entry.?.context = ctx;
+    entry.?.id = id;
+
+    return @as(?*anyopaque, @ptrCast(@alignCast(entry)));
+}
+
+pub inline fn plogLength(plog: ?*Plog) usize {
+    return arrayObjLength(&plog.?.list);
+}
+
+// core/print.h
 
 // core/types.h
 
