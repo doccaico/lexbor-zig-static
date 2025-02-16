@@ -1209,6 +1209,85 @@ pub inline fn memAlignFloor(size: usize) usize {
     return if ((size % MEM_ALIGN_STEP) != 0) size - (size % MEM_ALIGN_STEP) else size;
 }
 
+// core/mraw.h
+
+pub const mraw_meta_size =
+    if ((@sizeOf(usize) % MEM_ALIGN_STEP) != 0)
+    @sizeOf(usize) + (MEM_ALIGN_STEP - (@sizeOf(usize) % MEM_ALIGN_STEP))
+else
+    @sizeOf(usize);
+
+pub const Mraw = extern struct {
+    mem: ?*Mem,
+    cache: ?*Bst,
+    ref_count: usize,
+
+    pub fn create() ?*Mraw {
+        return lexbor_mraw_create();
+    }
+
+    pub fn init(self: ?*Mraw, chunk_size: usize) status {
+        return lexbor_mraw_init(self, chunk_size);
+    }
+
+    pub fn clean(self: ?*Mraw) void {
+        lexbor_mraw_clean(self);
+    }
+
+    pub fn destroy(self: ?*Mraw, destroy_self: bool) ?*Mraw {
+        return lexbor_mraw_destroy(self, destroy_self);
+    }
+
+    pub fn alloc(self: ?*Mraw, size: usize) ?*anyopaque {
+        return lexbor_mraw_alloc(self, size);
+    }
+
+    pub fn calloc(self: ?*Mraw, size: usize) ?*anyopaque {
+        return lexbor_mraw_calloc(self, size);
+    }
+
+    pub fn realloc(self: ?*Mraw, data: ?*anyopaque, new_size: usize) ?*anyopaque {
+        return lexbor_mraw_realloc(self, data, new_size);
+    }
+
+    pub fn free(self: ?*Mraw, data: ?*anyopaque) ?*anyopaque {
+        return lexbor_mraw_free(self, data);
+    }
+};
+
+extern fn lexbor_mraw_create() ?*Mraw;
+extern fn lexbor_mraw_init(mraw: ?*Mraw, chunk_size: usize) status;
+extern fn lexbor_mraw_clean(mraw: ?*Mraw) void;
+extern fn lexbor_mraw_destroy(mraw: ?*Mraw, destroy_self: bool) ?*Mraw;
+extern fn lexbor_mraw_alloc(mraw: ?*Mraw, size: usize) ?*anyopaque;
+extern fn lexbor_mraw_calloc(mraw: ?*Mraw, size: usize) ?*anyopaque;
+extern fn lexbor_mraw_realloc(mraw: ?*Mraw, data: ?*anyopaque, new_size: usize) ?*anyopaque;
+extern fn lexbor_mraw_free(mraw: ?*Mraw, data: ?*anyopaque) ?*anyopaque;
+extern fn lexbor_mraw_data_size_noi(data: ?*anyopaque) usize;
+extern fn lexbor_mraw_data_size_set_noi(data: ?*anyopaque, size: usize) void;
+extern fn lexbor_mraw_dup_noi(mraw: ?*Mraw, src: ?*const anyopaque, size: usize) ?*anyopaque;
+
+pub inline fn mrawDataSize(data: ?*anyopaque) usize {
+    return @as(*usize, @ptrFromInt(@intFromPtr(@as(*u8, @ptrCast(@alignCast(data.?)))) - mraw_meta_size)).*;
+}
+
+pub inline fn mrawDataSizeSet(data: ?*anyopaque, size: usize) void {
+    const dest: ?*anyopaque = @ptrFromInt(@intFromPtr(@as(*u8, @ptrCast(@alignCast(data.?)))) - mraw_meta_size);
+    memcpy(dest, @ptrFromInt(&size), @sizeOf(usize));
+}
+
+pub inline fn mrawDup(mraw: ?*Mraw, src: ?*const anyopaque, size: usize) ?*anyopaque {
+    const data = lexbor_mraw_alloc(mraw, size);
+    if (data) |d| {
+        memcpy(d, src, size);
+    }
+    return data;
+}
+
+pub inline fn mrawReferenceCount(mraw: ?*Mraw) usize {
+    return mraw.?.ref_count;
+}
+
 // core/types.h
 
 pub const codepoint = u32;
@@ -1216,16 +1295,6 @@ pub const char = u8;
 pub const status = c_uint;
 
 pub const callbackF = ?*const fn (buffer: ?*char, size: usize, ctx: ?*anyopaque) callconv(.C) status;
-
-// core/mraw.h
-
-pub const Mraw = extern struct {
-    mem: ?*Mem,
-    cache: ?*Bst,
-    ref_count: usize,
-};
-
-extern fn lexbor_mraw_free(mraw: ?*Mraw, data: ?*anyopaque) ?*anyopaque;
 
 // core/str.h
 
