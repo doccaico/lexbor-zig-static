@@ -1211,7 +1211,7 @@ pub inline fn memAlignFloor(size: usize) usize {
 
 // core/mraw.h
 
-pub const mraw_meta_size =
+pub const MRAW_META_SIZE =
     if ((@sizeOf(usize) % MEM_ALIGN_STEP) != 0)
     @sizeOf(usize) + (MEM_ALIGN_STEP - (@sizeOf(usize) % MEM_ALIGN_STEP))
 else
@@ -1268,12 +1268,12 @@ extern fn lexbor_mraw_data_size_set_noi(data: ?*anyopaque, size: usize) void;
 extern fn lexbor_mraw_dup_noi(mraw: ?*Mraw, src: ?*const anyopaque, size: usize) ?*anyopaque;
 
 pub inline fn mrawDataSize(data: ?*anyopaque) usize {
-    return @as(*usize, @ptrFromInt(@intFromPtr(@as(*u8, @ptrCast(data.?))) - mraw_meta_size)).*;
+    return @as(*usize, @ptrFromInt(@intFromPtr(@as(*u8, @ptrCast(data.?))) - MRAW_META_SIZE)).*;
 }
 
 pub inline fn mrawDataSizeSet(data: ?*anyopaque, size: usize) void {
-    const dest: ?*anyopaque = @ptrFromInt(@intFromPtr(@as(*u8, @ptrCast(data.?))) - mraw_meta_size);
-    memcpy(dest, @ptrFromInt(&size), @sizeOf(usize));
+    const dest: ?*anyopaque = @ptrFromInt(@intFromPtr(@as(*u8, @ptrCast(data.?))) - MRAW_META_SIZE);
+    _ = memcpy(dest, @ptrCast(@constCast(&size)), @sizeOf(usize));
 }
 
 pub inline fn mrawDup(mraw: ?*Mraw, src: ?*const anyopaque, size: usize) ?*anyopaque {
