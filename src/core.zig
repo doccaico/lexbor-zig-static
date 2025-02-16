@@ -1288,6 +1288,17 @@ pub inline fn mrawReferenceCount(mraw: ?*Mraw) usize {
     return mraw.?.ref_count;
 }
 
+// core/perf.h
+
+extern fn lexbor_perf_create() ?*anyopaque;
+extern fn lexbor_perf_clean(perf: ?*anyopaque) void;
+extern fn lexbor_perf_destroy(perf: ?*anyopaque) void;
+extern fn lexbor_perf_begin(perf: ?*anyopaque) status;
+extern fn lexbor_perf_end(perf: ?*anyopaque) status;
+extern fn lexbor_perf_in_sec(perf: ?*anyopaque) f64;
+
+// core/plog.h
+
 // core/types.h
 
 pub const codepoint = u32;
