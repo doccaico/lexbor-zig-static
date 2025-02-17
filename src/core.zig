@@ -1426,7 +1426,7 @@ pub inline fn shsHashGetStatic(table: ?[*]const ShsHash, table_size: usize, key:
 // TODO: #define lexbor_str_len(str) lexbor_str_get(str, length)
 
 pub inline fn str(p: [*:0]const u8) Str {
-    return .{ .data = p, .length = @sizeOf(p) - 1 };
+    return .{ .data = @constCast(p), .length = std.mem.indexOfSentinel(u8, 0, p) - 1 };
 }
 
 // TODO: #define lexbor_str_check_size_arg_m(str, size, mraw, plus_len, return_fail)
@@ -1434,7 +1434,101 @@ pub inline fn str(p: [*:0]const u8) Str {
 pub const Str = extern struct {
     data: ?[*]char,
     length: usize,
+
+    pub fn create() ?*Str {
+        return lexbor_str_create();
+    }
+
+    pub fn init(self: ?*Str, mraw: ?*Mraw, data: ?*const char, length: usize) ?*char {
+        return lexbor_str_init(self, mraw, data, length);
+    }
+
+    pub fn init_append(self: ?*Str, mraw: ?*Mraw, data: ?*const char, length: usize) ?*char {
+        return lexbor_str_append(self, mraw, data, length);
+    }
+
+    pub fn clean(self: ?*Str) void {
+        return lexbor_str_clean(self);
+    }
+
+    pub fn clean_all(self: ?*Str) void {
+        return lexbor_str_clean_all(self);
+    }
+
+    pub fn destroy(self: ?*Str, mraw: ?*Mraw, destroy_obj: bool) ?*Str {
+        return lexbor_str_destroy(self, mraw, destroy_obj);
+    }
+
+    pub fn realloc(self: ?*Str, mraw: ?*Mraw, new_size: usize) ?*char {
+        return lexbor_str_realloc(self, mraw, new_size);
+    }
+
+    pub fn chunkSize(self: ?*Str, mraw: ?*Mraw, plus_len: usize) ?*char {
+        return lexbor_str_chunk_size(self, mraw, plus_len);
+    }
+
+    pub fn append(self: ?*Str, mraw: ?*Mraw, data: ?*const char, length: usize) ?*char {
+        return lexbor_str_append(self, mraw, data, length);
+    }
+
+    pub fn appendBefore(self: ?*Str, mraw: ?*Mraw, buff: ?*const char, length: usize) ?*char {
+        return lexbor_str_append_before(self, mraw, buff, length);
+    }
+
+    pub fn appendOne(self: ?*Str, mraw: ?*Mraw, data: char) ?*char {
+        return lexbor_str_append_one(self, mraw, data);
+    }
+
+    pub fn appendLowercase(self: ?*Str, mraw: ?*Mraw, data: ?*const char, length: usize) ?*char {
+        return lexbor_str_append_lowercase(self, mraw, data, length);
+    }
+
+    pub fn appendWithRepNullChars(self: ?*Str, mraw: ?*Mraw, buff: ?*const char, length: usize) ?*char {
+        return lexbor_str_append_with_rep_null_chars(self, mraw, buff, length);
+    }
+
+    pub fn copy(self: ?*Str, target: ?*const char, mraw: ?*Mraw) ?*char {
+        return lexbor_str_copy(self, target, mraw);
+    }
+
+    pub fn stayOnlyWhitespace(self: ?*Str) void {
+        return lexbor_str_stay_only_whitespace(self);
+    }
+
+    pub fn stripCollapseWhitespace(self: ?*Str) void {
+        return lexbor_str_strip_collapse_whitespace(self);
+    }
+
+    pub fn cropWhitespaceFromBegin(self: ?*Str) usize {
+        return lexbor_str_crop_whitespace_from_begin(self);
+    }
+
+    pub fn whitespaceFromBegin(self: ?*Str) usize {
+        return lexbor_str_whitespace_from_begin(self);
+    }
+
+    pub fn whitespaceFromEnd(self: ?*Str) usize {
+        return lexbor_str_whitespace_from_end(self);
+    }
 };
+
+pub fn strDataNcasecmpFirst(first: ?*const char, sec: ?*const char, sec_size: usize) ?*char {
+    return lexbor_str_data_ncasecmp_first(first, sec, sec_size);
+}
+
+pub fn strDataNcasecmpEnd(first: ?*const char, sec: ?*const char, size: usize) bool {
+    return lexbor_str_data_ncasecmp_end(first, sec, size);
+}
+
+pub fn strDataNcasecmpContain(where: ?*const char, where_size: usize, what: ?*const char, what_size: usize) bool {
+    return lexbor_str_data_ncasecmp_contain(where, where_size, what, what_size);
+}
+
+pub fn strDataNcasecmp(first: ?*const char, sec: ?*const char, size: usize) bool {
+    return lexbor_str_data_ncasecmp(first, sec, size);
+}
+
+// TODO
 
 extern fn lexbor_str_create() ?*Str;
 extern fn lexbor_str_init(str: ?*Str, mraw: ?*Mraw, data: ?*const char, length: usize) ?*char;
