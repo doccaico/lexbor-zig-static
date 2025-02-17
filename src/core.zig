@@ -1421,10 +1421,9 @@ pub inline fn shsHashGetStatic(table: ?[*]const ShsHash, table_size: usize, key:
 
 // core/str.h
 
-// TODO
-// #define lexbor_str_get(str, attr) str->attr
-// #define lexbor_str_set(str, attr) lexbor_str_get(str, attr)
-// #define lexbor_str_len(str) lexbor_str_get(str, length)
+// TODO: #define lexbor_str_get(str, attr) str->attr
+// TODO: #define lexbor_str_set(str, attr) lexbor_str_get(str, attr)
+// TODO: #define lexbor_str_len(str) lexbor_str_get(str, length)
 
 pub inline fn str(p: [*:0]const u8) Str {
     return .{ .data = p, .length = @sizeOf(p) - 1 };
@@ -1473,6 +1472,38 @@ extern fn lexbor_str_data_to_lowercase(to: ?*char, from: ?*const char, len: usiz
 extern fn lexbor_str_data_to_uppercase(to: ?*char, from: ?*const char, len: usize) void;
 extern fn lexbor_str_data_find_lowercase(data: ?*const char, len: usize) ?*char;
 extern fn lexbor_str_data_find_uppercase(data: ?*const char, len: usize) ?*char;
+extern fn lexbor_str_data_noi(str: ?*Str) ?*char;
+extern fn lexbor_str_length_noi(str: ?*Str) usize;
+extern fn lexbor_str_size_noi(str: ?*Str) usize;
+extern fn lexbor_str_data_set_noi(str: ?*Str, data: ?*char) usize;
+extern fn lexbor_str_length_set_noi(str: ?*Str, mraw: ?*Mraw, length: usize) ?*char;
+
+pub inline fn strData(str_: ?*Str) ?[*]char {
+    return str_.?.data;
+}
+
+pub inline fn strLength(str_: ?*Str) usize {
+    return str_.?.length;
+}
+
+pub inline fn strSize(str_: ?*Str) usize {
+    return mrawDataSize(str_.?.data);
+}
+
+pub inline fn strDataSet(str_: ?*Str, data: ?*char) void {
+    str_.?.data = data;
+}
+
+pub inline fn strLengthSet(str_: ?*Str, mraw: ?*Mraw, length: usize) ?*char {
+    if (length >= strSize(str)) {
+        _ = lexbor_str_realloc(str, mraw, length + 1) orelse return null;
+    }
+
+    str_.?.length = length;
+    str_.?.data[length] = 0x00;
+
+    return str_.?.data;
+}
 
 // core/types.h
 
