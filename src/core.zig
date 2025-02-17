@@ -474,39 +474,37 @@ pub inline fn bstMapMraw(bst_map: ?*BstMap) ?*Mraw {
 
 // core/conv.h
 
-pub const Conv = struct {
-    pub fn floatToData(num: f64, buf: ?*char, len: usize) usize {
-        return lexbor_conv_float_to_data(num, buf, len);
-    }
+pub fn convFloatToData(num: f64, buf: ?*char, len: usize) usize {
+    return lexbor_conv_float_to_data(num, buf, len);
+}
 
-    pub fn longToData(num: c_long, buf: ?*char, len: usize) usize {
-        return lexbor_conv_long_to_data(num, buf, len);
-    }
+pub fn convLongToData(num: c_long, buf: ?*char, len: usize) usize {
+    return lexbor_conv_long_to_data(num, buf, len);
+}
 
-    pub fn int64ToData(num: i64, buf: ?*char, len: usize) usize {
-        return lexbor_conv_int64_to_data(num, buf, len);
-    }
+pub fn convInt64ToData(num: i64, buf: ?*char, len: usize) usize {
+    return lexbor_conv_int64_to_data(num, buf, len);
+}
 
-    pub fn dataToDouble(start: ?*const ?*char, len: usize) f64 {
-        return lexbor_conv_data_to_double(start, len);
-    }
+pub fn convDataToDouble(start: ?*const ?*char, len: usize) f64 {
+    return lexbor_conv_data_to_double(start, len);
+}
 
-    pub fn dataToUlong(data: ?*const ?*char, length: usize) c_ulong {
-        return lexbor_conv_data_to_ulong(data, length);
-    }
+pub fn convDataToUlong(data: ?*const ?*char, length: usize) c_ulong {
+    return lexbor_conv_data_to_ulong(data, length);
+}
 
-    pub fn dataToLong(data: ?*const ?*char, length: usize) c_long {
-        return lexbor_conv_data_to_long(data, length);
-    }
+pub fn convDataToLong(data: ?*const ?*char, length: usize) c_long {
+    return lexbor_conv_data_to_long(data, length);
+}
 
-    pub fn dataToUint(data: ?*const ?*char, length: usize) c_uint {
-        return lexbor_conv_data_to_uint(data, length);
-    }
+pub fn convDataToUint(data: ?*const ?*char, length: usize) c_uint {
+    return lexbor_conv_data_to_uint(data, length);
+}
 
-    pub fn decToHex(number: u32, out: ?*char, length: usize) usize {
-        return lexbor_conv_dec_to_hex(number, out, length);
-    }
-};
+pub fn convDecToHex(number: u32, out: ?*char, length: usize) usize {
+    return lexbor_conv_dec_to_hex(number, out, length);
+}
 
 extern fn lexbor_conv_float_to_data(num: f64, buf: ?*char, len: usize) usize;
 extern fn lexbor_conv_long_to_data(num: c_long, buf: ?*char, len: usize) usize;
@@ -1093,27 +1091,25 @@ pub const memoryReallocF = ?*const fn (dst: ?*anyopaque, size: usize) callconv(.
 pub const memoryCallocF = ?*const fn (num: usize, size: usize) callconv(.C) ?*anyopaque;
 pub const memoryFreeF = ?*const fn (dst: ?*anyopaque) callconv(.C) void;
 
-pub const Memory = struct {
-    pub fn malloc(size: usize) ?*anyopaque {
-        return lexbor_malloc(size);
-    }
+pub fn memoryMalloc(size: usize) ?*anyopaque {
+    return lexbor_malloc(size);
+}
 
-    pub fn realloc(dst: ?*anyopaque, size: usize) ?*anyopaque {
-        return lexbor_realloc(dst, size);
-    }
+pub fn memoryRealloc(dst: ?*anyopaque, size: usize) ?*anyopaque {
+    return lexbor_realloc(dst, size);
+}
 
-    pub fn calloc(num: usize, size: usize) ?*anyopaque {
-        return lexbor_calloc(num, size);
-    }
+pub fn memoryCalloc(num: usize, size: usize) ?*anyopaque {
+    return lexbor_calloc(num, size);
+}
 
-    pub fn free(dst: ?*anyopaque) void {
-        lexbor_free(dst);
-    }
+pub fn memoryFree(dst: ?*anyopaque) void {
+    lexbor_free(dst);
+}
 
-    pub fn setup(new_malloc: memoryMallocF, new_realloc: memoryReallocF, new_calloc: memoryCallocF, new_free: memoryFreeF) void {
-        lexbor_memory_setup(new_malloc, new_realloc, new_calloc, new_free);
-    }
-};
+pub fn memorySetup(new_malloc: memoryMallocF, new_realloc: memoryReallocF, new_calloc: memoryCallocF, new_free: memoryFreeF) void {
+    lexbor_memory_setup(new_malloc, new_realloc, new_calloc, new_free);
+}
 
 extern fn lexbor_malloc(size: usize) ?*anyopaque;
 extern fn lexbor_realloc(dst: *anyopaque, size: usize) ?*anyopaque;
@@ -1345,7 +1341,7 @@ pub inline fn plogLength(plog: ?*Plog) usize {
 
 // core/print.h
 
-// TODO
+// TODO: https://github.com/ziglang/zig/issues/16961
 // pub fn printfSize(format: [*:0]const u8, ...) callconv(.C) usize {
 //     var ap = @cVaStart();
 //     defer @cVaEnd(&ap);
@@ -1425,7 +1421,58 @@ pub inline fn shsHashGetStatic(table: ?[*]const ShsHash, table_size: usize, key:
 
 // core/str.h
 
+// TODO
+// #define lexbor_str_get(str, attr) str->attr
+// #define lexbor_str_set(str, attr) lexbor_str_get(str, attr)
+// #define lexbor_str_len(str) lexbor_str_get(str, length)
+
+pub inline fn str(p: [*:0]const u8) Str {
+    return .{ .data = p, .length = @sizeOf(p) - 1 };
+}
+
 // TODO: #define lexbor_str_check_size_arg_m(str, size, mraw, plus_len, return_fail)
+
+pub const Str = extern struct {
+    data: ?[*]char,
+    length: usize,
+};
+
+extern fn lexbor_str_create() ?*Str;
+extern fn lexbor_str_init(str: ?*Str, mraw: ?*Mraw, data: ?*const char, length: usize) ?*char;
+extern fn lexbor_str_init_append(str: ?*Str, mraw: ?*Mraw, data: ?*const char, length: usize) ?*char;
+extern fn lexbor_str_clean(str: ?*Str) void;
+extern fn lexbor_str_clean_all(str: ?*Str) void;
+extern fn lexbor_str_destroy(str: ?*Str, mraw: ?*Mraw, destroy_obj: bool) ?*Str;
+extern fn lexbor_str_realloc(str: ?*Str, mraw: ?*Mraw, new_size: usize) ?*char;
+extern fn lexbor_str_chunk_size(str: ?*Str, mraw: ?*Mraw, plus_len: usize) ?*char;
+extern fn lexbor_str_append(str: ?*Str, mraw: ?*Mraw, data: ?*const char, length: usize) ?*char;
+extern fn lexbor_str_append_before(str: ?*Str, mraw: ?*Mraw, buff: ?*const char, length: usize) ?*char;
+extern fn lexbor_str_append_one(str: ?*Str, mraw: ?*Mraw, data: char) ?*char;
+extern fn lexbor_str_append_lowercase(str: ?*Str, mraw: ?*Mraw, data: ?*const char, length: usize) ?*char;
+extern fn lexbor_str_append_with_rep_null_chars(str: ?*Str, mraw: ?*Mraw, buff: ?*const char, length: usize) ?*char;
+extern fn lexbor_str_copy(dest: ?*Str, target: ?*const char, mraw: ?*Mraw) ?*char;
+extern fn lexbor_str_stay_only_whitespace(target: ?*Str) void;
+extern fn lexbor_str_strip_collapse_whitespace(target: ?*Str) void;
+extern fn lexbor_str_crop_whitespace_from_begin(target: ?*Str) usize;
+extern fn lexbor_str_whitespace_from_begin(target: ?*Str) usize;
+extern fn lexbor_str_whitespace_from_end(target: ?*Str) usize;
+// Data utils
+extern fn lexbor_str_data_ncasecmp_first(first: ?*const char, sec: ?*const char, sec_size: usize) ?*char;
+extern fn lexbor_str_data_ncasecmp_end(first: ?*const char, sec: ?*const char, size: usize) bool;
+extern fn lexbor_str_data_ncasecmp_contain(where: ?*const char, where_size: usize, what: ?*const char, what_size: usize) bool;
+extern fn lexbor_str_data_ncasecmp(first: ?*const char, sec: ?*const char, size: usize) bool;
+extern fn lexbor_str_data_nlocmp_right(first: ?*const char, sec: ?*const char, size: usize) bool;
+extern fn lexbor_str_data_nupcmp_right(first: ?*const char, sec: ?*const char, size: usize) bool;
+extern fn lexbor_str_data_casecmp(first: ?*const char, sec: ?*const char) bool;
+extern fn lexbor_str_data_ncmp_end(first: ?*const char, sec: ?*const char) bool;
+extern fn lexbor_str_data_ncmp_contain(where: ?*const char, where_size: usize, what: ?*const char, what_size: usize) bool;
+extern fn lexbor_str_data_ncmp(first: ?*const char, sec: ?*const char, size: usize) bool;
+extern fn lexbor_str_data_cmp(first: ?*const char, sec: ?*const char) bool;
+extern fn lexbor_str_data_cmp_ws(first: ?*const char, sec: ?*const char) bool;
+extern fn lexbor_str_data_to_lowercase(to: ?*char, from: ?*const char, len: usize) void;
+extern fn lexbor_str_data_to_uppercase(to: ?*char, from: ?*const char, len: usize) void;
+extern fn lexbor_str_data_find_lowercase(data: ?*const char, len: usize) ?*char;
+extern fn lexbor_str_data_find_uppercase(data: ?*const char, len: usize) ?*char;
 
 // core/types.h
 
@@ -1434,10 +1481,3 @@ pub const char = u8;
 pub const status = c_uint;
 
 pub const callbackF = ?*const fn (buffer: ?*char, size: usize, ctx: ?*anyopaque) callconv(.C) status;
-
-// core/str.h
-
-pub const Str = extern struct {
-    data: ?[*]char,
-    length: usize,
-};
