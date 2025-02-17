@@ -1345,10 +1345,16 @@ pub inline fn plogLength(plog: ?*Plog) usize {
 
 // core/print.h
 
-extern fn lexbor_printf_size(format: ?[*:0]const c_char, ...) usize;
-// extern fn lexbor_vprintf_size() usize;
-extern fn lexbor_sprintf_size(dst: ?*char, size: usize, format: ?[*:0]const c_char, ...) usize;
-// extern fn lexbor_vsprintf_size() usize;
+// TODO
+// pub fn printfSize(format: [*:0]const u8, ...) callconv(.C) usize {
+//     var ap = @cVaStart();
+//     defer @cVaEnd(&ap);
+//     return lexbor_printf_size(format, ap);
+// }
+// extern fn lexbor_printf_size(format: [*:0]const u8, ...) usize;
+// extern fn lexbor_vprintf_size(format: [*:0]const c_char, va: [*c]u8) usize;
+// extern fn lexbor_sprintf(dst: ?*char, size: usize, format: [*:0]const c_char, ...) usize;
+// extern fn lexbor_vsprintf(dst: ?*char, size: usize, format: [*:0]const c_char, va: [*c]u8) usize;
 
 // core/sbst.h
 
@@ -1377,7 +1383,7 @@ pub inline fn sbstEntryStatic(strt: ?*const SbstEntryStatic, root: ?*const SbstE
 
 // core/serialize.h
 
-// #define lexbor_serialize_write(cb, data, length, ctx, status)
+// TODO: #define lexbor_serialize_write(cb, data, length, ctx, status)
 
 extern fn lexbor_serialize_length_cb(data: ?*const char, length: usize, ctx: ?*anyopaque) status;
 extern fn lexbor_serialize_copy_cb(data: ?*const char, length: usize, ctx: ?*anyopaque) status;
@@ -1419,7 +1425,7 @@ pub inline fn shsHashGetStatic(table: ?[*]const ShsHash, table_size: usize, key:
 
 // core/str.h
 
-// #define lexbor_str_check_size_arg_m(str, size, mraw, plus_len, return_fail)
+// TODO: #define lexbor_str_check_size_arg_m(str, size, mraw, plus_len, return_fail)
 
 // core/types.h
 
